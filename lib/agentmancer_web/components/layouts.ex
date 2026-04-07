@@ -73,6 +73,11 @@ defmodule AgentmancerWeb.Layouts do
                 <.icon name="hero-cog-6-tooth" class="size-4" /> Settings
               </.link>
             </li>
+            <li>
+              <a href="/oban" target="_blank" class="gap-2">
+                <.icon name="hero-queue-list" class="size-4" /> Job Dashboard
+              </a>
+            </li>
           </ul>
         </nav>
 

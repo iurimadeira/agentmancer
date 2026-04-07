@@ -2,6 +2,7 @@ defmodule AgentmancerWeb.Router do
   use AgentmancerWeb, :router
 
   import AgentmancerWeb.UserAuth
+  import Oban.Web.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -44,6 +45,8 @@ defmodule AgentmancerWeb.Router do
 
   scope "/", AgentmancerWeb do
     pipe_through [:browser, :require_authenticated_user]
+
+    oban_dashboard("/oban")
 
     live_session :require_authenticated_user,
       on_mount: [{AgentmancerWeb.UserAuth, :require_authenticated}] do

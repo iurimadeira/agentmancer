@@ -95,6 +95,19 @@ defmodule Agentmancer.Vault do
     |> Repo.all()
   end
 
+  def required_variables_status(variables) do
+    existing_keys = MapSet.new(Enum.map(variables, & &1.key))
+
+    Enum.map(Agentmancer.Vault.RequiredVariables.list(), fn req ->
+      Map.put(req, :configured, MapSet.member?(existing_keys, req.key))
+    end)
+  end
+
+  def optional_variables(variables) do
+    required_keys = MapSet.new(Agentmancer.Vault.RequiredVariables.keys())
+    Enum.reject(variables, fn v -> MapSet.member?(required_keys, v.key) end)
+  end
+
   def set_variable(scope_id, key, value, opts \\ []) do
     is_secret = Keyword.get(opts, :is_secret, false)
     description = Keyword.get(opts, :description)

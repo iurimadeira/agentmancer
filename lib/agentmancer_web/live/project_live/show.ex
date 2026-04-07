@@ -11,6 +11,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
   @impl true
   def mount(%{"slug" => slug}, _session, socket) do
     project = Projects.get_project_by_slug!(slug)
+    variables = load_project_variables(project.id)
 
     {:ok,
      assign(socket,
@@ -24,7 +25,9 @@ defmodule AgentmancerWeb.ProjectLive.Show do
        var_key: "",
        var_value: "",
        var_secret: false,
-       variables: load_project_variables(project.id),
+       variables: variables,
+       required_vars_status: Vault.required_variables_status(variables),
+       optional_variables: Vault.optional_variables(variables),
        scope_id: nil
      )}
   end
@@ -62,9 +65,12 @@ defmodule AgentmancerWeb.ProjectLive.Show do
     {:noreply, assign(socket, repo_form: to_form(changeset))}
   end
 
-  def handle_event("save_variable", %{"key" => key, "value" => value, "secret" => secret}, socket) do
+  def handle_event(
+        "save_required_variable",
+        %{"key" => key, "value" => value, "secret" => secret},
+        socket
+      ) do
     project = socket.assigns.project
-
     {:ok, scope} = Vault.get_or_create_scope(:project, project_id: project.id)
 
     case Vault.set_variable(scope.id, key, value, is_secret: secret == "true") do
@@ -72,17 +78,33 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         {:noreply,
          socket
          |> put_flash(:info, "Variable saved.")
-         |> assign(
-           variables: load_project_variables(project.id),
-           var_key: "",
-           var_value: "",
-           var_secret: false,
-           scope_id: scope.id
-         )}
+         |> assign(scope_id: scope.id)
+         |> reload_project_variables()}
 
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to save variable.")}
     end
+  end
+
+  def handle_event("save_variable", %{"key" => key, "value" => value, "secret" => secret}, socket) do
+    project = socket.assigns.project
+    {:ok, scope} = Vault.get_or_create_scope(:project, project_id: project.id)
+
+    case Vault.set_variable(scope.id, key, value, is_secret: secret == "true") do
+      {:ok, _var} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Variable saved.")
+         |> assign(var_key: "", var_value: "", var_secret: false, scope_id: scope.id)
+         |> reload_project_variables()}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to save variable.")}
+    end
+  end
+
+  def handle_event("save_variable", %{"key" => key, "value" => value}, socket) do
+    handle_event("save_variable", %{"key" => key, "value" => value, "secret" => "false"}, socket)
   end
 
   def handle_event("delete_variable", %{"id" => id}, socket) do
@@ -91,7 +113,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         {:noreply,
          socket
          |> put_flash(:info, "Variable deleted.")
-         |> assign(variables: load_project_variables(socket.assigns.project.id))}
+         |> reload_project_variables()}
 
       {:error, _} ->
         {:noreply, put_flash(socket, :error, "Failed to delete variable.")}
@@ -103,6 +125,16 @@ defmodule AgentmancerWeb.ProjectLive.Show do
       {:ok, scope} -> Vault.list_variables_for_scope(scope.id)
       _ -> []
     end
+  end
+
+  defp reload_project_variables(socket) do
+    variables = load_project_variables(socket.assigns.project.id)
+
+    assign(socket,
+      variables: variables,
+      required_vars_status: Vault.required_variables_status(variables),
+      optional_variables: Vault.optional_variables(variables)
+    )
   end
 
   @impl true
@@ -150,6 +182,8 @@ defmodule AgentmancerWeb.ProjectLive.Show do
           runs={@runs}
           repo_form={@repo_form}
           variables={@variables}
+          required_vars_status={@required_vars_status}
+          optional_variables={@optional_variables}
           var_key={@var_key}
           var_value={@var_value}
           var_secret={@var_secret}
@@ -281,7 +315,54 @@ defmodule AgentmancerWeb.ProjectLive.Show do
     <div class="space-y-6">
       <div class="card bg-base-200">
         <div class="card-body">
-          <h3 class="card-title text-sm">Add/Update Variable</h3>
+          <h3 class="card-title text-sm">Required Variables</h3>
+          <p class="text-sm text-base-content/60 mb-2">
+            Inherits from global scope if not set here.
+          </p>
+          <div class="space-y-4">
+            <div
+              :for={req <- @required_vars_status}
+              class="flex flex-wrap gap-3 items-end border-b border-base-300/30 pb-4 last:border-0"
+            >
+              <div class="flex-1 min-w-[200px]">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-sm">{req.key}</span>
+                  <span :if={req.configured} class="badge badge-sm badge-success">
+                    Configured
+                  </span>
+                  <span :if={!req.configured} class="badge badge-sm badge-error">
+                    Not configured
+                  </span>
+                </div>
+                <p class="text-xs text-base-content/50 mt-1">{req.description}</p>
+              </div>
+              <form phx-submit="save_required_variable" class="flex gap-2 items-end">
+                <input type="hidden" name="key" value={req.key} />
+                <input type="hidden" name="secret" value={to_string(req.secret)} />
+                <div class="form-control">
+                  <input
+                    type="password"
+                    name="value"
+                    required
+                    class="input input-bordered w-64"
+                    placeholder={if req.configured, do: "Update value...", else: "Enter value..."}
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  {if req.configured, do: "Update", else: "Save"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Add Variable</h3>
+          <p class="text-sm text-base-content/60 mb-2">
+            Custom variables scoped to this project.
+          </p>
           <form phx-submit="save_variable" class="flex flex-wrap gap-3 items-end">
             <div class="form-control">
               <label class="label"><span class="label-text">Key</span></label>
@@ -322,11 +403,11 @@ defmodule AgentmancerWeb.ProjectLive.Show do
 
       <div class="card bg-base-200">
         <div class="card-body">
-          <h3 class="card-title text-sm">Project Variables</h3>
-          <div :if={@variables == []} class="text-base-content/60 text-sm">
-            No project variables set.
+          <h3 class="card-title text-sm">Custom Variables</h3>
+          <div :if={@optional_variables == []} class="text-base-content/60 text-sm">
+            No custom variables set.
           </div>
-          <.table :if={@variables != []} id="variables" rows={@variables}>
+          <.table :if={@optional_variables != []} id="variables" rows={@optional_variables}>
             <:col :let={var} label="Key">{var.key}</:col>
             <:col :let={var} label="Value">
               <span :if={var.is_secret} class="text-base-content/40 italic">***hidden***</span>

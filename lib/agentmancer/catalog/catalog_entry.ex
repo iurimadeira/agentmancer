@@ -12,6 +12,7 @@ defmodule Agentmancer.Catalog.CatalogEntry do
     field :author, :string
     field :system_prompt, :string
     field :output_schema, :map, default: %{}
+    field :suggested_trigger, :map, default: %{}
 
     timestamps()
   end
@@ -28,7 +29,8 @@ defmodule Agentmancer.Catalog.CatalogEntry do
       :icon,
       :author,
       :system_prompt,
-      :output_schema
+      :output_schema,
+      :suggested_trigger
     ])
     |> validate_required([:name, :slug, :system_prompt])
     |> validate_format(:slug, ~r/^[a-z0-9-]+$/)

@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "required": ["prs_processed", "summary"],
+  "properties": {
+    "prs_processed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pr_number", "pr_title", "comments_total", "comments_addressed", "comments_not_addressed", "details"],
+        "properties": {
+          "pr_number": { "type": "integer" },
+          "pr_title": { "type": "string" },
+          "comments_total": { "type": "integer" },
+          "comments_addressed": { "type": "integer" },
+          "comments_not_addressed": { "type": "integer" },
+          "commit_sha": { "type": "string" },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["comment_id", "file_path", "action", "explanation"],
+              "properties": {
+                "comment_id": { "type": "integer" },
+                "file_path": { "type": "string" },
+                "reviewer": { "type": "string" },
+                "action": { "type": "string", "enum": ["addressed", "not_addressed", "already_resolved"] },
+                "explanation": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": { "type": "string" }
+  }
+}

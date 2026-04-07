@@ -4,7 +4,7 @@ defmodule Agentmancer.Projects.Seeder do
   alias Agentmancer.Catalog
   alias Agentmancer.Workflows
 
-  @default_agent_slugs ~w(pr-reviewer auto-fixer ticket-triager digest-reporter)
+  @default_agent_slugs ~w(pr-reviewer auto-pr-addresser ticket-triager digest-reporter)
 
   @default_workflows [
     %{
@@ -14,10 +14,10 @@ defmodule Agentmancer.Projects.Seeder do
       description: "Auto-review PRs on push/open"
     },
     %{
-      name: "Auto-Fix",
-      slug: "auto-fix",
-      agent_slug: "auto-fixer",
-      description: "Fix issues found in PR review"
+      name: "PR Review Addresser",
+      slug: "auto-pr-addresser",
+      agent_slug: "auto-pr-addresser",
+      description: "Address unresolved PR review comments"
     },
     %{
       name: "Ticket Triage",

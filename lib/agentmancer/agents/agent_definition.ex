@@ -8,6 +8,10 @@ defmodule Agentmancer.Agents.AgentDefinition do
     field :kind, Ecto.Enum, values: [:pr_review, :auto_fix, :ticket_triage, :digest, :custom]
     field :category, :string
     field :template_slug, :string
+    field :trigger_type, Ecto.Enum, values: [:schedule, :webhook, :manual]
+    field :trigger_config, :map, default: %{}
+    field :trigger_enabled, :boolean, default: false
+    field :last_triggered_at, :utc_datetime_usec
     field :archived_at, :utc_datetime_usec
 
     belongs_to :project, Agentmancer.Projects.Project
@@ -28,6 +32,10 @@ defmodule Agentmancer.Agents.AgentDefinition do
       :kind,
       :category,
       :template_slug,
+      :trigger_type,
+      :trigger_config,
+      :trigger_enabled,
+      :last_triggered_at,
       :archived_at,
       :project_id,
       :runtime_profile_id,

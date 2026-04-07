@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_path": { "type": "string" },
+          "line_start": { "type": "integer" },
+          "line_end": { "type": "integer" },
+          "severity": { "type": "string", "enum": ["critical", "warning", "suggestion", "praise"] },
+          "category": { "type": "string" },
+          "title": { "type": "string" },
+          "body": { "type": "string" },
+          "suggested_fix": { "type": "string" }
+        },
+        "required": ["file_path", "severity", "category", "title", "body"]
+      }
+    },
+    "summary": { "type": "string" }
+  },
+  "required": ["findings", "summary"]
+}

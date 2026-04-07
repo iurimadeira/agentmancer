@@ -41,11 +41,11 @@ defmodule Agentmancer.Execution do
     |> Repo.preload([
       :project,
       :workflow_definition,
-      :agent_definition,
       :agent_version,
       :repository,
       :trigger,
-      attempts: :run
+      attempts: :run,
+      agent_definition: :runtime_profile
     ])
   end
 

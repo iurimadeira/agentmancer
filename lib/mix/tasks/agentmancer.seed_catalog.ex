@@ -36,7 +36,8 @@ defmodule Mix.Tasks.Agentmancer.SeedCatalog do
           icon: Map.get(template, "icon", "hero-cpu-chip"),
           author: Map.get(template, "author"),
           system_prompt: prompt,
-          output_schema: schema
+          output_schema: schema,
+          suggested_trigger: Map.get(template, "suggested_trigger", %{})
         }
 
         case Catalog.get_catalog_entry_by_slug(slug) do

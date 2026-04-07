@@ -51,17 +51,24 @@ defmodule Agentmancer.Catalog do
     kind = if entry.kind in @valid_kinds, do: String.to_existing_atom(entry.kind), else: :custom
 
     Repo.transaction(fn ->
+      trigger_attrs = trigger_attrs_from_entry(entry)
+
       {:ok, agent_def} =
-        Agents.create_agent_definition(%{
-          project_id: project_id,
-          name: entry.name,
-          slug: entry.slug,
-          kind: kind,
-          category: entry.category,
-          description: entry.description,
-          runtime_profile_id: runtime_profile_id,
-          template_slug: entry.slug
-        })
+        Agents.create_agent_definition(
+          Map.merge(
+            %{
+              project_id: project_id,
+              name: entry.name,
+              slug: entry.slug,
+              kind: kind,
+              category: entry.category,
+              description: entry.description,
+              runtime_profile_id: runtime_profile_id,
+              template_slug: entry.slug
+            },
+            trigger_attrs
+          )
+        )
 
       {:ok, _version} =
         Agents.create_version(agent_def, %{
@@ -82,16 +89,23 @@ defmodule Agentmancer.Catalog do
     slug = Keyword.get(opts, :slug, entry.slug)
 
     Repo.transaction(fn ->
-      case Agents.create_agent_definition(%{
-             project_id: project_id,
-             name: name,
-             slug: slug,
-             kind: kind,
-             category: entry.category,
-             description: entry.description,
-             runtime_profile_id: runtime_profile_id,
-             template_slug: entry.slug
-           }) do
+      trigger_attrs = trigger_attrs_from_entry(entry)
+
+      case Agents.create_agent_definition(
+             Map.merge(
+               %{
+                 project_id: project_id,
+                 name: name,
+                 slug: slug,
+                 kind: kind,
+                 category: entry.category,
+                 description: entry.description,
+                 runtime_profile_id: runtime_profile_id,
+                 template_slug: entry.slug
+               },
+               trigger_attrs
+             )
+           ) do
         {:ok, agent_def} ->
           {:ok, _version} =
             Agents.create_version(agent_def, %{
@@ -109,6 +123,16 @@ defmodule Agentmancer.Catalog do
       end
     end)
   end
+
+  defp trigger_attrs_from_entry(%{suggested_trigger: %{"type" => type} = trigger}) do
+    %{
+      trigger_type: String.to_existing_atom(type),
+      trigger_config: Map.get(trigger, "config", %{}),
+      trigger_enabled: false
+    }
+  end
+
+  defp trigger_attrs_from_entry(_), do: %{}
 
   defp apply_filters(query, []), do: query
 

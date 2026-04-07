@@ -221,28 +221,40 @@ defmodule Agentmancer.Runtime.RunServer do
   # Private helpers
 
   defp resolve_adapter(run) do
-    engine =
-      case run do
-        %{agent_definition: %{runtime_profile: %{engine: engine}}} -> engine
-        _ -> :claude_code_cli
-      end
-
-    case engine do
-      :codex_cli -> Agentmancer.Runtime.Adapters.CodexCLI
-      :claude_code_cli -> Agentmancer.Runtime.Adapters.ClaudeCodeCLI
+    case resolve_runtime_profile(run) do
+      %{engine: :codex_cli} -> Agentmancer.Runtime.Adapters.CodexCLI
+      %{engine: :claude_code_cli} -> Agentmancer.Runtime.Adapters.ClaudeCodeCLI
       _ -> Agentmancer.Runtime.Adapters.ClaudeCodeCLI
     end
   end
 
   defp resolve_timeout(run) do
-    case run do
-      %{agent_definition: %{runtime_profile: %{timeout_seconds: secs}}} when is_integer(secs) ->
+    case resolve_runtime_profile(run) do
+      %{timeout_seconds: secs} when is_integer(secs) ->
         secs * 1_000
 
       _ ->
         600_000
     end
   end
+
+  defp resolve_model(run) do
+    case resolve_runtime_profile(run) do
+      %{model: model} when is_binary(model) and model != "" -> model
+      _ -> nil
+    end
+  end
+
+  defp resolve_runtime_profile(%{
+         agent_definition: %{runtime_profile: %Ecto.Association.NotLoaded{}}
+       }),
+       do: nil
+
+  defp resolve_runtime_profile(%{agent_definition: %{runtime_profile: runtime_profile}})
+       when not is_nil(runtime_profile),
+       do: runtime_profile
+
+  defp resolve_runtime_profile(_), do: nil
 
   defp build_workspace_spec(run) do
     repo = run.repository
@@ -275,7 +287,7 @@ defmodule Agentmancer.Runtime.RunServer do
       worktree_path: workspace_ctx.worktree_path,
       env_vars: %{},
       timeout_ms: resolve_timeout(run),
-      model: nil,
+      model: resolve_model(run),
       mcp_config_path: nil,
       sandbox_mode: :workspace_write,
       extra_args: []

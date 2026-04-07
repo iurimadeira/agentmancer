@@ -7,27 +7,37 @@ defmodule Agentmancer.Workers.ScheduleTriggerWorker do
 
   @impl Oban.Worker
   def perform(_job) do
-    schedules = Workflows.list_due_schedules()
+    for trigger <- Workflows.list_due_schedules(),
+        schedule_matches_now?(trigger.config, trigger.last_triggered_at) do
+      {:ok, event} =
+        Workflows.create_trigger_event(%{
+          trigger_id: trigger.id,
+          project_id: trigger.project_id,
+          event_type: "cron.fire"
+        })
 
-    for trigger <- schedules do
-      if schedule_matches_now?(trigger.config) do
-        {:ok, event} =
-          Workflows.create_trigger_event(%{
-            trigger_id: trigger.id,
-            project_id: trigger.project_id,
-            event_type: "cron.fire"
-          })
-
-        enqueue_runs_for_trigger(trigger, event)
-        Workflows.update_trigger(trigger, %{last_triggered_at: DateTime.utc_now()})
-      end
+      enqueue_runs_for_trigger(trigger, event)
+      Workflows.update_trigger(trigger, %{last_triggered_at: DateTime.utc_now()})
     end
 
     :ok
   end
 
-  defp schedule_matches_now?(%{"cron_expression" => _cron}), do: true
-  defp schedule_matches_now?(_), do: false
+  defp schedule_matches_now?(%{"cron_expression" => cron}, last_triggered_at) do
+    with {:ok, expr} <- Crontab.CronExpression.Parser.parse(cron) do
+      Crontab.DateChecker.matches_date?(expr, NaiveDateTime.utc_now()) and
+        not fired_this_minute?(DateTime.utc_now(), last_triggered_at)
+    else
+      _ ->
+        Logger.warning("Invalid cron expression: #{cron}")
+        false
+    end
+  end
+
+  defp schedule_matches_now?(_, _), do: false
+
+  defp fired_this_minute?(_now, nil), do: false
+  defp fired_this_minute?(now, last), do: DateTime.diff(now, last, :second) < 60
 
   defp enqueue_runs_for_trigger(trigger, event) do
     trigger =

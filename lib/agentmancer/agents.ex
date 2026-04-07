@@ -35,6 +35,20 @@ defmodule Agentmancer.Agents do
     AgentDefinition.changeset(agent_def, attrs)
   end
 
+  def list_scheduled_agents do
+    AgentDefinition
+    |> where([a], a.trigger_type == :schedule and a.trigger_enabled == true)
+    |> where([a], is_nil(a.archived_at))
+    |> where([a], not is_nil(a.active_version_id))
+    |> Repo.all()
+  end
+
+  def update_last_triggered_at(%AgentDefinition{} = agent) do
+    agent
+    |> Ecto.Changeset.change(last_triggered_at: DateTime.utc_now())
+    |> Repo.update()
+  end
+
   # Agent Versions
 
   def create_version(%AgentDefinition{} = agent_def, attrs) do

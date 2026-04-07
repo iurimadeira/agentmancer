@@ -84,7 +84,11 @@ config :agentmancer, Oban,
     fix_loops: 2
   ],
   plugins: [
-    {Oban.Plugins.Pruner, max_age: 604_800}
+    {Oban.Plugins.Pruner, max_age: 604_800},
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"* * * * *", Agentmancer.Workers.ScheduleTriggerWorker}
+     ]}
   ]
 
 config :agentmancer, Agentmancer.Vault.Cipher,

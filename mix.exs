@@ -61,6 +61,7 @@ defmodule Agentmancer.MixProject do
        depth: 1},
       {:swoosh, "~> 1.16"},
       {:oban, "~> 2.18"},
+      {:crontab, "~> 1.1"},
       {:oban_web, "~> 2.12"},
       {:cloak_ecto, "~> 1.3"},
       {:ex_json_schema, "~> 0.10"},

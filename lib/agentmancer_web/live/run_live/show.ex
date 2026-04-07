@@ -183,6 +183,7 @@ defmodule AgentmancerWeb.RunLive.Show do
                 <:item title="Agent">
                   {if @run.agent_definition, do: @run.agent_definition.name, else: "-"}
                 </:item>
+                <:item title="Model">{model_label(@run)}</:item>
                 <:item title="Repository">
                   {if @run.repository, do: @run.repository.name, else: "-"}
                 </:item>
@@ -257,6 +258,13 @@ defmodule AgentmancerWeb.RunLive.Show do
 
   defp format_dt(nil), do: "-"
   defp format_dt(dt), do: Calendar.strftime(dt, "%Y-%m-%d %H:%M:%S")
+
+  defp model_label(%{agent_definition: %{runtime_profile: %{model: model}}})
+       when is_binary(model) and model != "" do
+    model
+  end
+
+  defp model_label(_), do: "-"
 
   defp format_timestamp(nil), do: ""
   defp format_timestamp(dt), do: Calendar.strftime(dt, "%H:%M:%S")

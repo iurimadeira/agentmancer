@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+step() { printf "\n${BLUE}${BOLD}==> %s${NC}\n" "$1"; }
+ok()   { printf "${GREEN}  ✓ %s${NC}\n" "$1"; }
+warn() { printf "${YELLOW}  ! %s${NC}\n" "$1"; }
+
+cd "$(dirname "$0")/.."
+
+printf "${BOLD}Agentmancer Setup${NC}\n"
+
+# 1. Environment
+step "Setting up environment"
+
+if [ ! -f .envrc ]; then
+  cp .envrc.example .envrc
+  ok "Created .envrc from .envrc.example"
+else
+  ok ".envrc already exists"
+fi
+
+if command -v direnv &>/dev/null; then
+  direnv allow .
+fi
+
+set +u; source .envrc 2>/dev/null || true; set -u
+
+# 2. Dependencies
+step "Installing dependencies"
+mix deps.get
+ok "Dependencies installed"
+
+# 3. Database
+step "Setting up database"
+mix ecto.setup
+ok "Database ready"
+
+# 4. Assets
+step "Setting up assets"
+mix assets.setup
+ok "Assets ready"
+
+# 5. Admin user
+step "Creating admin user"
+mix agentmancer.setup_admin
+ok "Admin user ready"
+
+# Done
+printf "\n${GREEN}${BOLD}Setup complete!${NC}\n\n"
+printf "  Database: ${DB_NAME:-agentmancer_dev}\n"
+printf "  Port:     ${PORT:-4001}\n\n"
+printf "Start the server with:\n"
+printf "  ${BOLD}bin/dev${NC}\n\n"

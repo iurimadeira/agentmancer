@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+    "type": { "type": "string", "enum": ["bug", "feature_request", "question", "documentation"] },
+    "labels": { "type": "array", "items": { "type": "string" } },
+    "response": { "type": "string" },
+    "suggested_assignee": { "type": "string" },
+    "summary": { "type": "string" }
+  },
+  "required": ["priority", "type", "response", "summary"]
+}

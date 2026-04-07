@@ -1,0 +1,18 @@
+# Port and database (customize per worktree)
+export PORT=4001
+export DB_NAME=agentmancer_dev
+export TEST_DB_NAME=agentmancer_test
+
+# Cloak encryption key (base64-encoded 32-byte AES key)
+# Generate with: mix agentmancer.gen_cloak_key
+export CLOAK_KEY=""
+
+# GitHub (PAT for API access — or set as encrypted variable in Vault UI)
+export GITHUB_TOKEN=""
+
+# Slack (incoming webhook URL — or set as encrypted variable in Vault UI)
+export SLACK_WEBHOOK_URL=""
+
+# Phoenix
+export SECRET_KEY_BASE=""
+export PHX_HOST="localhost"

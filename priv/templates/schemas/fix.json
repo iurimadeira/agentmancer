@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "fixes_applied": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "finding_title": { "type": "string" },
+          "file_path": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string", "enum": ["applied", "skipped", "failed"] }
+        },
+        "required": ["finding_title", "file_path", "status"]
+      }
+    },
+    "summary": { "type": "string" }
+  },
+  "required": ["fixes_applied", "summary"]
+}

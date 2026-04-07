@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+if command -v direnv >/dev/null 2>&1; then
+  direnv allow . 2>/dev/null || true
+  main_worktree="$(git worktree list --porcelain 2>/dev/null | head -1 | sed 's/^worktree //')"
+  if [ -n "${main_worktree}" ] && [ "${main_worktree}" != "$(pwd)" ]; then
+    direnv allow "${main_worktree}" 2>/dev/null || true
+  fi
+fi
+
+set +u; source .envrc 2>/dev/null || true; set -u
+
+PORT="${PORT:-4001}"
+
+mkdir -p tmp
+script -q -a tmp/dev.log iex -S mix phx.server

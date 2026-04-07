@@ -1,42 +1,10 @@
 defmodule Agentmancer.Projects.Seeder do
   alias Agentmancer.Repo
   alias Agentmancer.Agents
+  alias Agentmancer.Catalog
   alias Agentmancer.Workflows
 
-  @default_agents [
-    %{
-      name: "PR Reviewer",
-      slug: "pr-reviewer",
-      kind: :pr_review,
-      description: "Reviews PRs for bugs, security issues, and style",
-      prompt_file: "pr_reviewer_v1.md",
-      schema_file: "review.json"
-    },
-    %{
-      name: "Auto-Fixer",
-      slug: "auto-fixer",
-      kind: :auto_fix,
-      description: "Applies fixes for findings from PR review",
-      prompt_file: "auto_fixer_v1.md",
-      schema_file: "fix.json"
-    },
-    %{
-      name: "Ticket Triager",
-      slug: "ticket-triager",
-      kind: :ticket_triage,
-      description: "Triages incoming tickets and issues",
-      prompt_file: "ticket_triager_v1.md",
-      schema_file: "ticket_action.json"
-    },
-    %{
-      name: "Digest Reporter",
-      slug: "digest-reporter",
-      kind: :digest,
-      description: "Generates summary digest of recent activity",
-      prompt_file: "digest_reporter_v1.md",
-      schema_file: "digest.json"
-    }
-  ]
+  @default_agent_slugs ~w(pr-reviewer auto-fixer ticket-triager digest-reporter)
 
   @default_workflows [
     %{
@@ -131,29 +99,12 @@ defmodule Agentmancer.Projects.Seeder do
   defp seed_agents(project, profiles) do
     claude_profile = profiles["claude-default"]
 
-    for agent_spec <- @default_agents, into: %{} do
-      prompt = load_template(agent_spec.prompt_file)
-      schema = load_schema(agent_spec.schema_file)
-
-      {:ok, agent_def} =
-        Agents.create_agent_definition(%{
-          project_id: project.id,
-          name: agent_spec.name,
-          slug: agent_spec.slug,
-          kind: agent_spec.kind,
-          description: agent_spec.description,
-          runtime_profile_id: claude_profile.id
-        })
-
-      {:ok, _version} =
-        Agents.create_version(agent_def, %{
-          system_prompt: prompt,
-          output_schema: schema,
-          change_note: "Initial default version",
-          created_by: "system"
-        })
-
-      {agent_spec.slug, Repo.reload!(agent_def)}
+    for slug <- @default_agent_slugs,
+        entry = Catalog.get_catalog_entry_by_slug(slug),
+        entry != nil,
+        into: %{} do
+      {:ok, agent} = Catalog.install_to_project(entry, project.id, claude_profile.id)
+      {slug, agent}
     end
   end
 
@@ -194,26 +145,6 @@ defmodule Agentmancer.Projects.Seeder do
           enabled: false,
           config: trigger_spec.config
         })
-    end
-  end
-
-  defp load_template(filename) do
-    path = Application.app_dir(:agentmancer, ["priv", "templates", filename])
-
-    if File.exists?(path) do
-      File.read!(path)
-    else
-      "Default system prompt for #{Path.rootname(filename)}. Edit this in the agent settings."
-    end
-  end
-
-  defp load_schema(filename) do
-    path = Application.app_dir(:agentmancer, ["priv", "templates", "schemas", filename])
-
-    if File.exists?(path) do
-      path |> File.read!() |> Jason.decode!()
-    else
-      %{}
     end
   end
 end

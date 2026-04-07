@@ -6,6 +6,8 @@ defmodule Agentmancer.Agents.AgentDefinition do
     field :slug, :string
     field :description, :string
     field :kind, Ecto.Enum, values: [:pr_review, :auto_fix, :ticket_triage, :digest, :custom]
+    field :category, :string
+    field :template_slug, :string
     field :archived_at, :utc_datetime_usec
 
     belongs_to :project, Agentmancer.Projects.Project
@@ -24,6 +26,8 @@ defmodule Agentmancer.Agents.AgentDefinition do
       :slug,
       :description,
       :kind,
+      :category,
+      :template_slug,
       :archived_at,
       :project_id,
       :runtime_profile_id,

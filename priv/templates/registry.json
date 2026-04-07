@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "slug": "pr-reviewer",
+      "name": "PR Reviewer",
+      "description": "Reviews PRs for bugs, security issues, and style",
+      "category": "code_quality",
+      "kind": "pr_review",
+      "tags": ["review", "security", "quality"],
+      "icon": "hero-magnifying-glass",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "auto-fixer",
+      "name": "Auto-Fixer",
+      "description": "Applies fixes for findings from PR review",
+      "category": "code_quality",
+      "kind": "auto_fix",
+      "tags": ["fix", "automation"],
+      "icon": "hero-wrench-screwdriver",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "ticket-triager",
+      "name": "Ticket Triager",
+      "description": "Triages incoming tickets and issues",
+      "category": "project_management",
+      "kind": "ticket_triage",
+      "tags": ["triage", "issues", "tickets"],
+      "icon": "hero-inbox-stack",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "digest-reporter",
+      "name": "Digest Reporter",
+      "description": "Generates summary digest of recent activity",
+      "category": "reporting",
+      "kind": "digest",
+      "tags": ["digest", "summary", "reporting"],
+      "icon": "hero-newspaper",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "dependency-auditor",
+      "name": "Dependency Auditor",
+      "description": "Scans dependencies for vulnerabilities, outdated packages, and license issues",
+      "category": "security",
+      "kind": "custom",
+      "tags": ["security", "dependencies", "audit"],
+      "icon": "hero-shield-check",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "release-notes-generator",
+      "name": "Release Notes Generator",
+      "description": "Generates user-facing release notes from recent changes",
+      "category": "reporting",
+      "kind": "custom",
+      "tags": ["release", "changelog", "documentation"],
+      "icon": "hero-document-text",
+      "author": "Agentmancer"
+    },
+    {
+      "slug": "onboarding-guide",
+      "name": "Onboarding Guide",
+      "description": "Creates onboarding documentation for new contributors",
+      "category": "documentation",
+      "kind": "custom",
+      "tags": ["onboarding", "documentation", "contributor"],
+      "icon": "hero-academic-cap",
+      "author": "Agentmancer"
+    }
+  ]
+}

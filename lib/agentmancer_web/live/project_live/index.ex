@@ -78,7 +78,7 @@ defmodule AgentmancerWeb.ProjectLive.Index do
         Projects
         <:subtitle>Manage your agent projects</:subtitle>
         <:actions>
-          <.link navigate={~p"/projects/new"} class="btn btn-primary btn-sm">
+          <.link navigate={~p"/projects/new"} class="btn btn-primary">
             <.icon name="hero-plus" class="size-4" /> New Project
           </.link>
         </:actions>
@@ -116,7 +116,7 @@ defmodule AgentmancerWeb.ProjectLive.Index do
           <.input field={@form[:slug]} type="text" label="Slug" required phx-debounce="300" />
           <.input field={@form[:description]} type="textarea" label="Description" />
           <div class="mt-4 flex justify-end gap-2">
-            <.link navigate={~p"/projects"} class="btn btn-ghost btn-sm">Cancel</.link>
+            <.link navigate={~p"/projects"} class="btn btn-ghost">Cancel</.link>
             <.button variant="primary" phx-disable-with="Creating...">Create Project</.button>
           </div>
         </.form>
@@ -135,7 +135,7 @@ defmodule AgentmancerWeb.ProjectLive.Index do
       <div class="modal-box">
         <form method="dialog">
           <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            class="btn btn-circle btn-ghost absolute right-2 top-2"
             phx-click={@on_cancel}
           >
             <.icon name="hero-x-mark" class="size-4" />

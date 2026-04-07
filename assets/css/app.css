@@ -22,72 +22,37 @@
   We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
   on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
 @plugin "../vendor/daisyui-theme" {
-  name: "dark";
-  default: false;
+  name: "technomancer";
+  default: true;
   prefersdark: true;
   color-scheme: "dark";
-  --color-base-100: oklch(30.33% 0.016 252.42);
-  --color-base-200: oklch(25.26% 0.014 253.1);
-  --color-base-300: oklch(20.15% 0.012 254.09);
-  --color-base-content: oklch(97.807% 0.029 256.847);
-  --color-primary: oklch(58% 0.233 277.117);
-  --color-primary-content: oklch(96% 0.018 272.314);
-  --color-secondary: oklch(58% 0.233 277.117);
-  --color-secondary-content: oklch(96% 0.018 272.314);
-  --color-accent: oklch(60% 0.25 292.717);
-  --color-accent-content: oklch(96% 0.016 293.756);
-  --color-neutral: oklch(37% 0.044 257.287);
-  --color-neutral-content: oklch(98% 0.003 247.858);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(97% 0.013 236.62);
-  --color-success: oklch(60% 0.118 184.704);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
+  --color-base-100: oklch(22% 0.02 300);
+  --color-base-200: oklch(18% 0.025 300);
+  --color-base-300: oklch(14% 0.03 300);
+  --color-base-content: oklch(88% 0.04 155);
+  --color-primary: oklch(87% 0.34 142);
+  --color-primary-content: oklch(15% 0.04 142);
+  --color-secondary: oklch(53% 0.32 310);
+  --color-secondary-content: oklch(95% 0.02 310);
+  --color-accent: oklch(89% 0.18 192);
+  --color-accent-content: oklch(15% 0.04 192);
+  --color-neutral: oklch(30% 0.03 300);
+  --color-neutral-content: oklch(90% 0.03 155);
+  --color-info: oklch(89% 0.18 192);
+  --color-info-content: oklch(15% 0.04 192);
+  --color-success: oklch(87% 0.34 142);
+  --color-success-content: oklch(15% 0.04 142);
+  --color-warning: oklch(75% 0.17 85);
+  --color-warning-content: oklch(15% 0.04 85);
+  --color-error: oklch(55% 0.25 25);
+  --color-error-content: oklch(95% 0.02 25);
+  --radius-selector: 0.125rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.25rem;
   --size-selector: 0.21875rem;
   --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
-  --noise: 0;
-}
-
-@plugin "../vendor/daisyui-theme" {
-  name: "light";
-  default: true;
-  prefersdark: false;
-  color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(96% 0.001 286.375);
-  --color-base-300: oklch(92% 0.004 286.32);
-  --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(70% 0.213 47.604);
-  --color-primary-content: oklch(98% 0.016 73.684);
-  --color-secondary: oklch(55% 0.027 264.364);
-  --color-secondary-content: oklch(98% 0.002 247.839);
-  --color-accent: oklch(0% 0 0);
-  --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(44% 0.017 285.786);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(62% 0.214 259.815);
-  --color-info-content: oklch(97% 0.014 254.604);
-  --color-success: oklch(70% 0.14 182.503);
-  --color-success-content: oklch(98% 0.014 180.72);
-  --color-warning: oklch(66% 0.179 58.318);
-  --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
-  --radius-selector: 0.25rem;
-  --radius-field: 0.25rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.21875rem;
-  --size-field: 0.21875rem;
-  --border: 1.5px;
-  --depth: 1;
+  --border: 1px;
+  --depth: 0;
   --noise: 0;
 }
 
@@ -96,10 +61,425 @@
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
-/* Use the data attribute for dark mode  */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+/* Single theme — no dark variant needed */
 
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
-/* This file is for your main application CSS */
+/* ==========================================================
+   TECHNOMANCER — Custom CSS
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* --- Typography --- */
+
+html {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.card-title,
+.stat-value,
+.stat-title,
+th,
+code, pre,
+.font-mono,
+.font-semibold,
+.font-bold {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* --- Hex Grid Background --- */
+
+body {
+  background-color: oklch(22% 0.02 300);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* --- CRT Scanline Overlay --- */
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    oklch(0% 0 0 / 0.03) 2px,
+    oklch(0% 0 0 / 0.03) 4px
+  );
+}
+
+/* --- Glow Utility Classes --- */
+
+.tm-glow-green {
+  text-shadow: 0 0 6px oklch(87% 0.34 142 / 0.6), 0 0 12px oklch(87% 0.34 142 / 0.3);
+}
+
+.tm-glow-purple {
+  text-shadow: 0 0 6px oklch(53% 0.32 310 / 0.6), 0 0 12px oklch(53% 0.32 310 / 0.3);
+}
+
+.tm-glow-cyan {
+  text-shadow: 0 0 6px oklch(89% 0.18 192 / 0.6), 0 0 12px oklch(89% 0.18 192 / 0.3);
+}
+
+/* --- Sidebar --- */
+
+aside {
+  background: linear-gradient(180deg, oklch(17% 0.03 300) 0%, oklch(15% 0.04 310) 100%);
+  border-right: 1px solid oklch(87% 0.34 142 / 0.15);
+}
+
+.tm-brand {
+  text-shadow:
+    0 0 7px oklch(87% 0.34 142 / 0.7),
+    0 0 14px oklch(87% 0.34 142 / 0.4),
+    0 0 28px oklch(53% 0.32 310 / 0.2);
+  color: oklch(87% 0.34 142);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+aside .menu li a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  border-left: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+aside .menu li a:hover {
+  background: oklch(87% 0.34 142 / 0.08);
+  border-left-color: oklch(87% 0.34 142 / 0.5);
+  text-shadow: 0 0 8px oklch(87% 0.34 142 / 0.4);
+}
+
+aside .menu li a.active,
+aside .menu li a[aria-current="page"] {
+  background: oklch(87% 0.34 142 / 0.1);
+  border-left-color: oklch(87% 0.34 142);
+  color: oklch(87% 0.34 142);
+  text-shadow: 0 0 8px oklch(87% 0.34 142 / 0.5);
+}
+
+/* --- Cards / Arcane Panels --- */
+
+.card {
+  border: 1px solid oklch(87% 0.34 142 / 0.12);
+  background: linear-gradient(135deg, oklch(19% 0.025 300) 0%, oklch(17% 0.03 310) 100%);
+  box-shadow: 0 0 1px oklch(87% 0.34 142 / 0.2), inset 0 1px 0 oklch(87% 0.34 142 / 0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  border-color: oklch(87% 0.34 142 / 0.25);
+  box-shadow:
+    0 0 4px oklch(87% 0.34 142 / 0.15),
+    0 0 12px oklch(53% 0.32 310 / 0.08),
+    inset 0 1px 0 oklch(87% 0.34 142 / 0.08);
+}
+
+.card:focus-within {
+  border-color: oklch(53% 0.32 310 / 0.4);
+  box-shadow: 0 0 6px oklch(87% 0.34 142 / 0.2), 0 0 16px oklch(53% 0.32 310 / 0.1);
+}
+
+/* --- Stat Panels --- */
+
+.stat {
+  border: 1px solid oklch(87% 0.34 142 / 0.1);
+  background: linear-gradient(135deg, oklch(19% 0.025 300) 0%, oklch(17% 0.03 310) 100%);
+}
+
+.stat-value {
+  text-shadow: 0 0 8px currentColor;
+}
+
+.stat-title {
+  color: oklch(70% 0.04 155);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+/* --- Buttons --- */
+
+.btn-primary {
+  text-shadow: 0 0 6px oklch(87% 0.34 142 / 0.5);
+  box-shadow: 0 0 6px oklch(87% 0.34 142 / 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 8px oklch(87% 0.34 142 / 0.4), 0 0 20px oklch(87% 0.34 142 / 0.15);
+}
+
+.btn-ghost {
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: oklch(87% 0.34 142 / 0.08);
+  text-shadow: 0 0 6px oklch(87% 0.34 142 / 0.3);
+}
+
+/* --- Tables --- */
+
+.table th {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: oklch(87% 0.34 142 / 0.7);
+  border-bottom: 1px solid oklch(87% 0.34 142 / 0.15);
+}
+
+.table tr {
+  border-bottom-color: oklch(87% 0.34 142 / 0.07);
+}
+
+.table tr:hover {
+  background: oklch(87% 0.34 142 / 0.04);
+}
+
+/* --- Inputs --- */
+
+.input, .select, .textarea {
+  background: oklch(17% 0.025 300);
+  border-color: oklch(87% 0.34 142 / 0.15);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  border-color: oklch(87% 0.34 142 / 0.5);
+  box-shadow: 0 0 6px oklch(87% 0.34 142 / 0.15);
+  outline: none;
+}
+
+.label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: oklch(70% 0.04 155);
+}
+
+/* --- Badges --- */
+
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  text-shadow: 0 0 4px oklch(87% 0.34 142 / 0.4);
+}
+
+.badge-error {
+  text-shadow: 0 0 4px oklch(55% 0.25 25 / 0.4);
+}
+
+.badge-warning {
+  text-shadow: 0 0 4px oklch(75% 0.17 85 / 0.4);
+}
+
+/* --- Tabs --- */
+
+.tabs-bordered .tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom-color: oklch(87% 0.34 142 / 0.1);
+  transition: all 0.2s ease;
+}
+
+.tabs-bordered .tab-active,
+.tabs-bordered .tab.tab-active {
+  border-bottom-color: oklch(87% 0.34 142);
+  color: oklch(87% 0.34 142);
+  text-shadow: 0 0 6px oklch(87% 0.34 142 / 0.4);
+}
+
+/* --- Modals --- */
+
+.modal-box {
+  background: linear-gradient(135deg, oklch(20% 0.03 300) 0%, oklch(17% 0.035 310) 100%);
+  border: 1px solid oklch(53% 0.32 310 / 0.2);
+  box-shadow: 0 0 20px oklch(53% 0.32 310 / 0.1), 0 0 40px oklch(87% 0.34 142 / 0.05);
+}
+
+.modal-backdrop {
+  background: oklch(5% 0.02 300 / 0.8);
+  backdrop-filter: blur(4px);
+}
+
+/* --- Alerts / Flash --- */
+
+.alert {
+  border: 1px solid;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.alert-info {
+  background: oklch(89% 0.18 192 / 0.08);
+  border-color: oklch(89% 0.18 192 / 0.3);
+}
+
+.alert-error {
+  background: oklch(55% 0.25 25 / 0.08);
+  border-color: oklch(55% 0.25 25 / 0.3);
+}
+
+/* --- Steps / Timeline --- */
+
+.steps .step-primary::before,
+.steps .step-primary::after {
+  box-shadow: 0 0 4px oklch(87% 0.34 142 / 0.4);
+}
+
+.steps .step-success::before,
+.steps .step-success::after {
+  box-shadow: 0 0 4px oklch(87% 0.34 142 / 0.4);
+}
+
+.steps .step-error::before,
+.steps .step-error::after {
+  box-shadow: 0 0 4px oklch(55% 0.25 25 / 0.4);
+}
+
+/* --- Custom Neon Scrollbar --- */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(14% 0.02 300);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(87% 0.34 142 / 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(87% 0.34 142 / 0.5);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(87% 0.34 142 / 0.3) oklch(14% 0.02 300);
+}
+
+/* --- Animations --- */
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px oklch(87% 0.34 142 / 0.2);
+  }
+  50% {
+    box-shadow: 0 0 8px oklch(87% 0.34 142 / 0.3), 0 0 16px oklch(53% 0.32 310 / 0.1);
+  }
+}
+
+@keyframes arcane-spin {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.badge-warning {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.motion-safe\:animate-spin {
+  animation: spin 1s linear infinite, arcane-spin 3s linear infinite;
+}
+
+/* --- Links --- */
+
+.link-primary {
+  color: oklch(87% 0.34 142);
+  transition: text-shadow 0.2s ease;
+}
+
+.link-primary:hover {
+  text-shadow: 0 0 6px oklch(87% 0.34 142 / 0.5);
+}
+
+.link-hover:hover {
+  color: oklch(87% 0.34 142);
+  text-shadow: 0 0 4px oklch(87% 0.34 142 / 0.3);
+}
+
+/* --- Divider --- */
+
+.divider {
+  color: oklch(60% 0.04 155);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.divider::before,
+.divider::after {
+  background: linear-gradient(90deg, oklch(87% 0.34 142 / 0.2), oklch(53% 0.32 310 / 0.2));
+}
+
+/* --- Code / Pre Blocks --- */
+
+pre {
+  background: oklch(14% 0.03 300) !important;
+  border: 1px solid oklch(87% 0.34 142 / 0.1);
+  box-shadow: inset 0 0 12px oklch(53% 0.32 310 / 0.05);
+}
+
+/* --- Log Viewer --- */
+
+#log-viewer {
+  background: oklch(12% 0.02 300) !important;
+  border: 1px solid oklch(87% 0.34 142 / 0.1);
+  box-shadow: inset 0 0 20px oklch(0% 0 0 / 0.3);
+}
+
+/* --- List Component --- */
+
+.list {
+  border-color: oklch(87% 0.34 142 / 0.08);
+}
+
+.list-row {
+  border-bottom-color: oklch(87% 0.34 142 / 0.08);
+}
+
+/* --- Selection Highlight --- */
+
+::selection {
+  background: oklch(87% 0.34 142 / 0.25);
+  color: oklch(95% 0.02 142);
+}
+
+/* --- Topbar Loading Indicator --- */
+
+#topbar {
+  background: linear-gradient(90deg, oklch(87% 0.34 142), oklch(53% 0.32 310)) !important;
+}
+
+/* --- Auth Pages --- */
+
+.text-brand {
+  color: oklch(87% 0.34 142);
+}

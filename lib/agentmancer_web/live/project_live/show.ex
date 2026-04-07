@@ -113,7 +113,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         {@project.name}
         <:subtitle>{@project.description || "No description"}</:subtitle>
         <:actions>
-          <.link navigate={~p"/projects"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/projects"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Back
           </.link>
         </:actions>
@@ -166,7 +166,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         <div class="stat-title">Agents</div>
         <div class="stat-value text-sm">{length(@agents)}</div>
         <div class="stat-actions">
-          <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-sm btn-ghost">
+          <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost">
             View <.icon name="hero-arrow-right" class="size-3" />
           </.link>
         </div>
@@ -176,7 +176,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         <div class="stat-title">Workflows</div>
         <div class="stat-value text-sm">{length(@workflows)}</div>
         <div class="stat-actions">
-          <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-sm btn-ghost">
+          <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-ghost">
             View <.icon name="hero-arrow-right" class="size-3" />
           </.link>
         </div>
@@ -186,135 +186,169 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         <div class="stat-title">Repositories</div>
         <div class="stat-value text-sm">{length(@repos)}</div>
         <div class="stat-actions">
-          <.link navigate={~p"/projects/#{@project.slug}/repos"} class="btn btn-sm btn-ghost">
+          <.link navigate={~p"/projects/#{@project.slug}/repos"} class="btn btn-ghost">
             View <.icon name="hero-arrow-right" class="size-3" />
           </.link>
         </div>
       </div>
     </div>
 
-    <div class="mt-6">
-      <h3 class="font-semibold mb-3">Recent Runs</h3>
-      <div :if={@runs == []} class="text-base-content/60 text-sm">No runs for this project yet.</div>
-      <.table :if={@runs != []} id="project-runs" rows={@runs}>
-        <:col :let={run} label="#">{run.number}</:col>
-        <:col :let={run} label="Status">
-          <span class={["badge badge-sm", run_status_color(run.status)]}>{run.status}</span>
-        </:col>
-        <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
-        <:action :let={run}>
-          <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
-        </:action>
-      </.table>
+    <div class="card bg-base-200 mt-6">
+      <div class="card-body">
+        <h3 class="card-title text-sm">Recent Runs</h3>
+        <div :if={@runs == []} class="text-base-content/60 text-sm">
+          No runs for this project yet.
+        </div>
+        <.table :if={@runs != []} id="project-runs" rows={@runs}>
+          <:col :let={run} label="#">{run.number}</:col>
+          <:col :let={run} label="Status">
+            <span class={["badge badge-sm", run_status_color(run.status)]}>{run.status}</span>
+          </:col>
+          <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
+          <:action :let={run}>
+            <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
+          </:action>
+        </.table>
+      </div>
     </div>
 
-    <div class="mt-6">
-      <.list>
-        <:item title="Slug">{@project.slug}</:item>
-        <:item title="Created">{format_dt(@project.inserted_at)}</:item>
-      </.list>
+    <div class="card bg-base-200 mt-6">
+      <div class="card-body">
+        <h3 class="card-title text-sm">Details</h3>
+        <.list>
+          <:item title="Slug">{@project.slug}</:item>
+          <:item title="Created">{format_dt(@project.inserted_at)}</:item>
+        </.list>
+      </div>
     </div>
     """
   end
 
   defp tab_content(%{live_action: :repos} = assigns) do
     ~H"""
-    <div class="mb-6">
-      <h3 class="font-semibold mb-3">Add Repository</h3>
-      <.form
-        for={@repo_form}
-        id="repo-form"
-        phx-change="validate_repo"
-        phx-submit="save_repo"
-        class="flex flex-col gap-2 max-w-lg"
-      >
-        <.input field={@repo_form[:name]} type="text" label="Name" required />
-        <.input
-          field={@repo_form[:clone_url]}
-          type="text"
-          label="Clone URL"
-          required
-          placeholder="https://github.com/org/repo.git"
-        />
-        <.input field={@repo_form[:default_branch]} type="text" label="Default Branch" value="main" />
-        <.button variant="primary" phx-disable-with="Adding...">Add Repository</.button>
-      </.form>
-    </div>
+    <div class="space-y-6">
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Add Repository</h3>
+          <.form
+            for={@repo_form}
+            id="repo-form"
+            phx-change="validate_repo"
+            phx-submit="save_repo"
+            class="flex flex-col gap-2"
+          >
+            <.input field={@repo_form[:name]} type="text" label="Name" required />
+            <.input
+              field={@repo_form[:clone_url]}
+              type="text"
+              label="Clone URL"
+              required
+              placeholder="https://github.com/org/repo.git"
+            />
+            <.input
+              field={@repo_form[:default_branch]}
+              type="text"
+              label="Default Branch"
+              value="main"
+            />
+            <.button variant="primary" phx-disable-with="Adding...">Add Repository</.button>
+          </.form>
+        </div>
+      </div>
 
-    <div :if={@repos == []} class="text-base-content/60 text-sm">No repositories configured.</div>
-    <.table :if={@repos != []} id="repos" rows={@repos}>
-      <:col :let={repo} label="Name">{repo.name}</:col>
-      <:col :let={repo} label="Clone URL">
-        <span class="text-xs font-mono">{repo.clone_url}</span>
-      </:col>
-      <:col :let={repo} label="Branch">{repo.default_branch}</:col>
-      <:col :let={repo} label="Last Synced">{format_dt(repo.last_synced_at)}</:col>
-    </.table>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Repositories</h3>
+          <div :if={@repos == []} class="text-base-content/60 text-sm">
+            No repositories configured.
+          </div>
+          <.table :if={@repos != []} id="repos" rows={@repos}>
+            <:col :let={repo} label="Name">{repo.name}</:col>
+            <:col :let={repo} label="Clone URL">
+              <span class="text-xs font-mono">{repo.clone_url}</span>
+            </:col>
+            <:col :let={repo} label="Branch">{repo.default_branch}</:col>
+            <:col :let={repo} label="Last Synced">{format_dt(repo.last_synced_at)}</:col>
+          </.table>
+        </div>
+      </div>
+    </div>
     """
   end
 
   defp tab_content(%{live_action: :variables} = assigns) do
     ~H"""
-    <div class="mb-6">
-      <h3 class="font-semibold mb-3">Add/Update Variable</h3>
-      <form phx-submit="save_variable" class="flex flex-wrap gap-3 items-end max-w-2xl">
-        <div class="form-control">
-          <label class="label"><span class="label-text">Key</span></label>
-          <input
-            type="text"
-            name="key"
-            value={@var_key}
-            required
-            class="input input-bordered input-sm w-48"
-          />
+    <div class="space-y-6">
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Add/Update Variable</h3>
+          <form phx-submit="save_variable" class="flex flex-wrap gap-3 items-end">
+            <div class="form-control">
+              <label class="label"><span class="label-text">Key</span></label>
+              <input
+                type="text"
+                name="key"
+                value={@var_key}
+                required
+                class="input input-bordered w-48"
+              />
+            </div>
+            <div class="form-control">
+              <label class="label"><span class="label-text">Value</span></label>
+              <input
+                type="text"
+                name="value"
+                value={@var_value}
+                required
+                class="input input-bordered w-64"
+              />
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer gap-2">
+                <span class="label-text">Secret</span>
+                <input
+                  type="checkbox"
+                  name="secret"
+                  value="true"
+                  checked={@var_secret}
+                  class="checkbox"
+                />
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
         </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text">Value</span></label>
-          <input
-            type="text"
-            name="value"
-            value={@var_value}
-            required
-            class="input input-bordered input-sm w-64"
-          />
-        </div>
-        <div class="form-control">
-          <label class="label cursor-pointer gap-2">
-            <span class="label-text">Secret</span>
-            <input
-              type="checkbox"
-              name="secret"
-              value="true"
-              checked={@var_secret}
-              class="checkbox checkbox-sm"
-            />
-          </label>
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm">Save</button>
-      </form>
-    </div>
+      </div>
 
-    <div :if={@variables == []} class="text-base-content/60 text-sm">No project variables set.</div>
-    <.table :if={@variables != []} id="variables" rows={@variables}>
-      <:col :let={var} label="Key">{var.key}</:col>
-      <:col :let={var} label="Value">
-        <span :if={var.is_secret} class="text-base-content/40 italic">***hidden***</span>
-        <span :if={!var.is_secret} class="font-mono text-sm">{var.value_ciphertext}</span>
-      </:col>
-      <:col :let={var} label="Secret">
-        <span :if={var.is_secret} class="badge badge-sm badge-warning">secret</span>
-      </:col>
-      <:action :let={var}>
-        <button
-          phx-click="delete_variable"
-          phx-value-id={var.id}
-          class="btn btn-ghost btn-xs text-error"
-          data-confirm="Delete this variable?"
-        >
-          Delete
-        </button>
-      </:action>
-    </.table>
+      <div class="card bg-base-200">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Project Variables</h3>
+          <div :if={@variables == []} class="text-base-content/60 text-sm">
+            No project variables set.
+          </div>
+          <.table :if={@variables != []} id="variables" rows={@variables}>
+            <:col :let={var} label="Key">{var.key}</:col>
+            <:col :let={var} label="Value">
+              <span :if={var.is_secret} class="text-base-content/40 italic">***hidden***</span>
+              <span :if={!var.is_secret} class="font-mono text-sm">{var.value_ciphertext}</span>
+            </:col>
+            <:col :let={var} label="Secret">
+              <span :if={var.is_secret} class="badge badge-sm badge-warning">secret</span>
+            </:col>
+            <:action :let={var}>
+              <button
+                phx-click="delete_variable"
+                phx-value-id={var.id}
+                class="btn btn-ghost text-error"
+                data-confirm="Delete this variable?"
+              >
+                Delete
+              </button>
+            </:action>
+          </.table>
+        </div>
+      </div>
+    </div>
     """
   end
 

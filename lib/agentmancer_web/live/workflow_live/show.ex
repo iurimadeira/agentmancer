@@ -59,7 +59,7 @@ defmodule AgentmancerWeb.WorkflowLive.Show do
           </span>
         </:subtitle>
         <:actions>
-          <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Workflows
           </.link>
         </:actions>
@@ -124,19 +124,21 @@ defmodule AgentmancerWeb.WorkflowLive.Show do
         </div>
       </div>
 
-      <div class="mt-6">
-        <h3 class="font-semibold mb-3">Recent Runs</h3>
-        <div :if={@runs == []} class="text-base-content/60 text-sm">No runs yet.</div>
-        <.table :if={@runs != []} id="workflow-runs" rows={@runs}>
-          <:col :let={run} label="#">{run.number}</:col>
-          <:col :let={run} label="Status">
-            <span class={["badge badge-sm", run_status_color(run.status)]}>{run.status}</span>
-          </:col>
-          <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
-          <:action :let={run}>
-            <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
-          </:action>
-        </.table>
+      <div class="card bg-base-200 mt-6">
+        <div class="card-body">
+          <h3 class="card-title text-sm">Recent Runs</h3>
+          <div :if={@runs == []} class="text-base-content/60 text-sm">No runs yet.</div>
+          <.table :if={@runs != []} id="workflow-runs" rows={@runs}>
+            <:col :let={run} label="#">{run.number}</:col>
+            <:col :let={run} label="Status">
+              <span class={["badge badge-sm", run_status_color(run.status)]}>{run.status}</span>
+            </:col>
+            <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
+            <:action :let={run}>
+              <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
+            </:action>
+          </.table>
+        </div>
       </div>
 
       <div :if={@workflow.config && @workflow.config != %{}} class="mt-6">

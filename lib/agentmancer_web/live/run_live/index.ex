@@ -92,59 +92,63 @@ defmodule AgentmancerWeb.RunLive.Index do
         <:subtitle>All agent execution runs</:subtitle>
       </.header>
 
-      <form phx-change="filter" class="flex gap-3 mt-4 mb-4 items-end">
-        <div class="form-control">
-          <label class="label"><span class="label-text text-xs">Status</span></label>
-          <select name="status" class="select select-sm select-bordered">
-            <option value="">All statuses</option>
-            <option
-              :for={s <- ~w(pending preparing running success failure cancelled timed_out stale)}
-              value={s}
-              selected={@status_filter == s}
-            >
-              {s}
-            </option>
-          </select>
+      <div class="card bg-base-200 mt-6">
+        <div class="card-body">
+          <form phx-change="filter" class="flex gap-3 items-end mb-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text text-xs">Status</span></label>
+              <select name="status" class="select select-bordered">
+                <option value="">All statuses</option>
+                <option
+                  :for={s <- ~w(pending preparing running success failure cancelled timed_out stale)}
+                  value={s}
+                  selected={@status_filter == s}
+                >
+                  {s}
+                </option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label class="label"><span class="label-text text-xs">Project</span></label>
+              <select name="project_id" class="select select-bordered">
+                <option value="">All projects</option>
+                <option :for={p <- @projects} value={p.id} selected={@project_filter == p.id}>
+                  {p.name}
+                </option>
+              </select>
+            </div>
+          </form>
+
+          <div :if={@runs == []} class="text-base-content/60 py-8 text-center">
+            No runs found.
+          </div>
+
+          <.table :if={@runs != []} id="runs" rows={@runs}>
+            <:col :let={run} label="#">{run.number}</:col>
+            <:col :let={run} label="Status">
+              <span class={["badge badge-sm", status_color(run.status)]}>{run.status}</span>
+            </:col>
+            <:col :let={run} label="Branch">
+              <span :if={run.branch} class="text-xs font-mono">{run.branch}</span>
+              <span :if={!run.branch} class="text-base-content/40">-</span>
+            </:col>
+            <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
+            <:col :let={run} label="Duration">{format_duration(run)}</:col>
+            <:action :let={run}>
+              <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
+            </:action>
+          </.table>
+
+          <div class="flex justify-center gap-2 mt-4">
+            <button :if={@page > 0} phx-click="prev_page" class="btn btn-ghost">
+              <.icon name="hero-chevron-left" class="size-4" /> Previous
+            </button>
+            <span class="btn btn-ghost no-animation">Page {@page + 1}</span>
+            <button :if={length(@runs) == @per_page} phx-click="next_page" class="btn btn-ghost">
+              Next <.icon name="hero-chevron-right" class="size-4" />
+            </button>
+          </div>
         </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text text-xs">Project</span></label>
-          <select name="project_id" class="select select-sm select-bordered">
-            <option value="">All projects</option>
-            <option :for={p <- @projects} value={p.id} selected={@project_filter == p.id}>
-              {p.name}
-            </option>
-          </select>
-        </div>
-      </form>
-
-      <div :if={@runs == []} class="text-base-content/60 py-8 text-center">
-        No runs found.
-      </div>
-
-      <.table :if={@runs != []} id="runs" rows={@runs}>
-        <:col :let={run} label="#">{run.number}</:col>
-        <:col :let={run} label="Status">
-          <span class={["badge badge-sm", status_color(run.status)]}>{run.status}</span>
-        </:col>
-        <:col :let={run} label="Branch">
-          <span :if={run.branch} class="text-xs font-mono">{run.branch}</span>
-          <span :if={!run.branch} class="text-base-content/40">-</span>
-        </:col>
-        <:col :let={run} label="Started">{format_dt(run.started_at || run.inserted_at)}</:col>
-        <:col :let={run} label="Duration">{format_duration(run)}</:col>
-        <:action :let={run}>
-          <.link navigate={~p"/runs/#{run.id}"} class="link link-primary text-sm">View</.link>
-        </:action>
-      </.table>
-
-      <div class="flex justify-center gap-2 mt-4">
-        <button :if={@page > 0} phx-click="prev_page" class="btn btn-sm btn-ghost">
-          <.icon name="hero-chevron-left" class="size-4" /> Previous
-        </button>
-        <span class="btn btn-sm btn-ghost no-animation">Page {@page + 1}</span>
-        <button :if={length(@runs) == @per_page} phx-click="next_page" class="btn btn-sm btn-ghost">
-          Next <.icon name="hero-chevron-right" class="size-4" />
-        </button>
       </div>
     </Layouts.app>
     """

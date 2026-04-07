@@ -96,10 +96,10 @@ defmodule AgentmancerWeb.AgentLive.Show do
           {@agent.description}
         </:subtitle>
         <:actions>
-          <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Agents
           </.link>
-          <button phx-click="toggle_edit" class="btn btn-sm btn-primary">
+          <button phx-click="toggle_edit" class="btn btn-primary">
             {if @editing, do: "Cancel", else: "Edit / New Version"}
           </button>
         </:actions>
@@ -153,7 +153,7 @@ defmodule AgentmancerWeb.AgentLive.Show do
                     placeholder="What changed?"
                   />
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">
+                <button type="submit" class="btn btn-primary">
                   Create Version & Set Active
                 </button>
               </form>

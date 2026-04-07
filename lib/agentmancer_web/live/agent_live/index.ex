@@ -102,51 +102,53 @@ defmodule AgentmancerWeb.AgentLive.Index do
         Agents
         <:subtitle>{@project.name}</:subtitle>
         <:actions>
-          <.link navigate={~p"/projects/#{@project.slug}"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/projects/#{@project.slug}"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Project
           </.link>
-          <.link navigate={~p"/projects/#{@project.slug}/agents/new"} class="btn btn-primary btn-sm">
+          <.link navigate={~p"/projects/#{@project.slug}/agents/new"} class="btn btn-primary">
             <.icon name="hero-plus" class="size-4" /> New Agent
           </.link>
         </:actions>
       </.header>
 
-      <div class="mt-4 mb-4">
-        <form phx-change="filter_kind">
-          <select name="kind" class="select select-sm select-bordered">
-            <option value="">All kinds</option>
-            <option
-              :for={kind <- ~w(pr_review auto_fix ticket_triage digest custom)}
-              value={kind}
-              selected={@kind_filter == kind}
-            >
-              {kind}
-            </option>
-          </select>
-        </form>
-      </div>
+      <div class="card bg-base-200 mt-6">
+        <div class="card-body">
+          <form phx-change="filter_kind" class="mb-4">
+            <select name="kind" class="select select-bordered">
+              <option value="">All kinds</option>
+              <option
+                :for={kind <- ~w(pr_review auto_fix ticket_triage digest custom)}
+                value={kind}
+                selected={@kind_filter == kind}
+              >
+                {kind}
+              </option>
+            </select>
+          </form>
 
-      <div :if={@agents == []} class="text-base-content/60 py-8 text-center">
-        No agents defined. Create one to get started.
-      </div>
+          <div :if={@agents == []} class="text-base-content/60 py-8 text-center">
+            No agents defined. Create one to get started.
+          </div>
 
-      <.table :if={@agents != []} id="agents" rows={@agents}>
-        <:col :let={agent} label="Name">{agent.name}</:col>
-        <:col :let={agent} label="Kind">
-          <span class="badge badge-sm badge-outline">{agent.kind}</span>
-        </:col>
-        <:col :let={agent} label="Slug">
-          <span class="text-xs font-mono">{agent.slug}</span>
-        </:col>
-        <:action :let={agent}>
-          <.link
-            navigate={~p"/projects/#{@project.slug}/agents/#{agent.slug}"}
-            class="link link-primary text-sm"
-          >
-            View
-          </.link>
-        </:action>
-      </.table>
+          <.table :if={@agents != []} id="agents" rows={@agents}>
+            <:col :let={agent} label="Name">{agent.name}</:col>
+            <:col :let={agent} label="Kind">
+              <span class="badge badge-sm badge-outline">{agent.kind}</span>
+            </:col>
+            <:col :let={agent} label="Slug">
+              <span class="text-xs font-mono">{agent.slug}</span>
+            </:col>
+            <:action :let={agent}>
+              <.link
+                navigate={~p"/projects/#{@project.slug}/agents/#{agent.slug}"}
+                class="link link-primary text-sm"
+              >
+                View
+              </.link>
+            </:action>
+          </.table>
+        </div>
+      </div>
 
       <.modal
         :if={@show_modal}
@@ -181,7 +183,7 @@ defmodule AgentmancerWeb.AgentLive.Index do
             required
           />
           <div class="mt-4 flex justify-end gap-2">
-            <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost btn-sm">
+            <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost">
               Cancel
             </.link>
             <.button variant="primary" phx-disable-with="Creating...">Create Agent</.button>
@@ -198,7 +200,7 @@ defmodule AgentmancerWeb.AgentLive.Index do
       <div class="modal-box">
         <form method="dialog">
           <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            class="btn btn-circle btn-ghost absolute right-2 top-2"
             phx-click={@on_cancel}
           >
             <.icon name="hero-x-mark" class="size-4" />

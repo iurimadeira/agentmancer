@@ -84,41 +84,48 @@ defmodule AgentmancerWeb.WorkflowLive.Index do
         Workflows
         <:subtitle>{@project.name}</:subtitle>
         <:actions>
-          <.link navigate={~p"/projects/#{@project.slug}"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/projects/#{@project.slug}"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Project
           </.link>
           <.link
             navigate={~p"/projects/#{@project.slug}/workflows/new"}
-            class="btn btn-primary btn-sm"
+            class="btn btn-primary"
           >
             <.icon name="hero-plus" class="size-4" /> New Workflow
           </.link>
         </:actions>
       </.header>
 
-      <div :if={@workflows == []} class="text-base-content/60 py-8 text-center">
-        No workflows defined. Create one to get started.
-      </div>
+      <div class="card bg-base-200 mt-6">
+        <div class="card-body">
+          <div :if={@workflows == []} class="text-base-content/60 py-8 text-center">
+            No workflows defined. Create one to get started.
+          </div>
 
-      <.table :if={@workflows != []} id="workflows" rows={@workflows}>
-        <:col :let={wf} label="Name">{wf.name}</:col>
-        <:col :let={wf} label="Slug">
-          <span class="text-xs font-mono">{wf.slug}</span>
-        </:col>
-        <:col :let={wf} label="Enabled">
-          <span class={["badge badge-sm", if(wf.enabled, do: "badge-success", else: "badge-ghost")]}>
-            {if wf.enabled, do: "Yes", else: "No"}
-          </span>
-        </:col>
-        <:action :let={wf}>
-          <.link
-            navigate={~p"/projects/#{@project.slug}/workflows/#{wf.slug}"}
-            class="link link-primary text-sm"
-          >
-            View
-          </.link>
-        </:action>
-      </.table>
+          <.table :if={@workflows != []} id="workflows" rows={@workflows}>
+            <:col :let={wf} label="Name">{wf.name}</:col>
+            <:col :let={wf} label="Slug">
+              <span class="text-xs font-mono">{wf.slug}</span>
+            </:col>
+            <:col :let={wf} label="Enabled">
+              <span class={[
+                "badge badge-sm",
+                if(wf.enabled, do: "badge-success", else: "badge-ghost")
+              ]}>
+                {if wf.enabled, do: "Yes", else: "No"}
+              </span>
+            </:col>
+            <:action :let={wf}>
+              <.link
+                navigate={~p"/projects/#{@project.slug}/workflows/#{wf.slug}"}
+                class="link link-primary text-sm"
+              >
+                View
+              </.link>
+            </:action>
+          </.table>
+        </div>
+      </div>
 
       <.modal
         :if={@show_modal}
@@ -132,7 +139,7 @@ defmodule AgentmancerWeb.WorkflowLive.Index do
           <.input field={@form[:slug]} type="text" label="Slug" required phx-debounce="300" />
           <.input field={@form[:description]} type="textarea" label="Description" />
           <div class="mt-4 flex justify-end gap-2">
-            <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-ghost btn-sm">
+            <.link navigate={~p"/projects/#{@project.slug}/workflows"} class="btn btn-ghost">
               Cancel
             </.link>
             <.button variant="primary" phx-disable-with="Creating...">Create Workflow</.button>
@@ -149,7 +156,7 @@ defmodule AgentmancerWeb.WorkflowLive.Index do
       <div class="modal-box">
         <form method="dialog">
           <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            class="btn btn-circle btn-ghost absolute right-2 top-2"
             phx-click={@on_cancel}
           >
             <.icon name="hero-x-mark" class="size-4" />

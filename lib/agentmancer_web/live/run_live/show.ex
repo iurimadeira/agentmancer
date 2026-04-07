@@ -86,13 +86,13 @@ defmodule AgentmancerWeb.RunLive.Show do
           <span :if={@run.branch} class="ml-2 text-xs font-mono">{@run.branch}</span>
         </:subtitle>
         <:actions>
-          <.link navigate={~p"/runs"} class="btn btn-ghost btn-sm">
+          <.link navigate={~p"/runs"} class="btn btn-ghost">
             <.icon name="hero-arrow-left" class="size-4" /> Runs
           </.link>
           <button
             :if={@run.status in [:pending, :preparing, :running]}
             phx-click="cancel_run"
-            class="btn btn-sm btn-error btn-outline"
+            class="btn btn-error btn-outline"
             data-confirm="Cancel this run?"
           >
             Cancel
@@ -100,7 +100,7 @@ defmodule AgentmancerWeb.RunLive.Show do
           <button
             :if={@run.status in [:failure, :timed_out]}
             phx-click="retry_run"
-            class="btn btn-sm btn-warning btn-outline"
+            class="btn btn-warning btn-outline"
           >
             Retry
           </button>

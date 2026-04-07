@@ -82,81 +82,86 @@ defmodule AgentmancerWeb.SettingLive.Index do
         <:subtitle>Global configuration and variables</:subtitle>
       </.header>
 
-      <div class="mt-6">
-        <h2 class="text-lg font-semibold mb-4">Global Variables</h2>
-        <p class="text-sm text-base-content/60 mb-4">
-          Global variables are available to all projects and workflows.
-        </p>
-
-        <div class="mb-6">
-          <form phx-submit="save_variable" class="flex flex-wrap gap-3 items-end max-w-2xl">
-            <div class="form-control">
-              <label class="label"><span class="label-text">Key</span></label>
-              <input
-                type="text"
-                name="key"
-                value={@var_key}
-                required
-                class="input input-bordered input-sm w-48"
-                placeholder="API_KEY"
-              />
-            </div>
-            <div class="form-control">
-              <label class="label"><span class="label-text">Value</span></label>
-              <input
-                type="text"
-                name="value"
-                value={@var_value}
-                required
-                class="input input-bordered input-sm w-64"
-                placeholder="value..."
-              />
-            </div>
-            <div class="form-control">
-              <label class="label cursor-pointer gap-2">
-                <span class="label-text">Secret</span>
+      <div class="mt-6 space-y-6">
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-sm">Add Variable</h3>
+            <p class="text-sm text-base-content/60 mb-2">
+              Global variables are available to all projects and workflows.
+            </p>
+            <form phx-submit="save_variable" class="flex flex-wrap gap-3 items-end">
+              <div class="form-control">
+                <label class="label"><span class="label-text">Key</span></label>
                 <input
-                  type="checkbox"
-                  name="secret"
-                  value="true"
-                  checked={@var_secret}
-                  class="checkbox checkbox-sm"
+                  type="text"
+                  name="key"
+                  value={@var_key}
+                  required
+                  class="input input-bordered w-48"
+                  placeholder="API_KEY"
                 />
-              </label>
+              </div>
+              <div class="form-control">
+                <label class="label"><span class="label-text">Value</span></label>
+                <input
+                  type="text"
+                  name="value"
+                  value={@var_value}
+                  required
+                  class="input input-bordered w-64"
+                  placeholder="value..."
+                />
+              </div>
+              <div class="form-control">
+                <label class="label cursor-pointer gap-2">
+                  <span class="label-text">Secret</span>
+                  <input
+                    type="checkbox"
+                    name="secret"
+                    value="true"
+                    checked={@var_secret}
+                    class="checkbox"
+                  />
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Variable</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card bg-base-200">
+          <div class="card-body">
+            <h3 class="card-title text-sm">Global Variables</h3>
+            <div :if={@variables == []} class="text-base-content/60 text-sm">
+              No global variables set.
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Save Variable</button>
-          </form>
+            <.table :if={@variables != []} id="global-variables" rows={@variables}>
+              <:col :let={var} label="Key">
+                <span class="font-mono text-sm">{var.key}</span>
+              </:col>
+              <:col :let={var} label="Value">
+                <span :if={var.is_secret} class="text-base-content/40 italic">***hidden***</span>
+                <span :if={!var.is_secret} class="font-mono text-sm">{var.value_ciphertext}</span>
+              </:col>
+              <:col :let={var} label="Secret">
+                <span :if={var.is_secret} class="badge badge-sm badge-warning">secret</span>
+              </:col>
+              <:col :let={var} label="Description">
+                <span class="text-sm text-base-content/60">{var.description || "-"}</span>
+              </:col>
+              <:action :let={var}>
+                <button
+                  phx-click="delete_variable"
+                  phx-value-id={var.id}
+                  class="btn btn-ghost text-error"
+                  data-confirm="Delete this variable?"
+                >
+                  Delete
+                </button>
+              </:action>
+            </.table>
+          </div>
         </div>
-
-        <div :if={@variables == []} class="text-base-content/60 text-sm">
-          No global variables set.
-        </div>
-
-        <.table :if={@variables != []} id="global-variables" rows={@variables}>
-          <:col :let={var} label="Key">
-            <span class="font-mono text-sm">{var.key}</span>
-          </:col>
-          <:col :let={var} label="Value">
-            <span :if={var.is_secret} class="text-base-content/40 italic">***hidden***</span>
-            <span :if={!var.is_secret} class="font-mono text-sm">{var.value_ciphertext}</span>
-          </:col>
-          <:col :let={var} label="Secret">
-            <span :if={var.is_secret} class="badge badge-sm badge-warning">secret</span>
-          </:col>
-          <:col :let={var} label="Description">
-            <span class="text-sm text-base-content/60">{var.description || "-"}</span>
-          </:col>
-          <:action :let={var}>
-            <button
-              phx-click="delete_variable"
-              phx-value-id={var.id}
-              class="btn btn-ghost btn-xs text-error"
-              data-confirm="Delete this variable?"
-            >
-              Delete
-            </button>
-          </:action>
-        </.table>
       </div>
     </Layouts.app>
     """

@@ -36,12 +36,17 @@ defmodule AgentmancerWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class="flex h-screen overflow-hidden">
-      <aside class="w-64 flex flex-col bg-base-200 border-r border-base-300 shrink-0">
-        <div class="p-4 border-b border-base-300">
-          <.link navigate={~p"/"} class="text-lg font-bold tracking-tight">Agentmancer</.link>
+      <aside class="w-64 flex flex-col shrink-0">
+        <div class="p-4 border-b border-base-300/50">
+          <.link navigate={~p"/"} class="tm-brand text-lg font-bold tracking-widest">
+            AGENTMANCER
+          </.link>
         </div>
 
         <nav class="flex-1 p-3">
+          <div class="text-xs font-mono uppercase tracking-wider mb-2 text-base-content/30">
+            Navigation
+          </div>
           <ul class="menu menu-sm gap-1">
             <li>
               <.link navigate={~p"/"} class="gap-2">
@@ -66,17 +71,14 @@ defmodule AgentmancerWeb.Layouts do
           </ul>
         </nav>
 
-        <div class="p-3 border-t border-base-300">
-          <div class="flex items-center gap-2 mb-2">
-            <.theme_toggle />
-          </div>
+        <div class="p-3 border-t border-base-300/30">
           <div
             :if={@current_scope && @current_scope.user}
-            class="text-xs text-base-content/60 truncate mb-1"
+            class="text-xs font-mono truncate mb-1 text-base-content/50"
           >
-            {@current_scope.user.email}
+            <span class="text-primary">$</span> {@current_scope.user.email}
           </div>
-          <div class="flex gap-2 text-xs">
+          <div class="flex gap-2 text-xs font-mono">
             <.link href={~p"/users/settings"} class="link link-hover">Account</.link>
             <.link href={~p"/users/log-out"} method="delete" class="link link-hover">Log out</.link>
           </div>
@@ -133,43 +135,6 @@ defmodule AgentmancerWeb.Layouts do
         {gettext("Attempting to reconnect")}
         <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
       </.flash>
-    </div>
-    """
-  end
-
-  @doc """
-  Provides dark vs light theme toggle based on themes defined in app.css.
-
-  See <head> in root.html.heex which applies the theme before page load.
-  """
-  def theme_toggle(assigns) do
-    ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="system"
-      >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="light"
-      >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        class="flex p-2 cursor-pointer w-1/3"
-        phx-click={JS.dispatch("phx:set-theme")}
-        data-phx-theme="dark"
-      >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
     </div>
     """
   end

@@ -102,7 +102,7 @@ defmodule AgentmancerWeb.SettingLive.Index do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Settings
-        <:subtitle>Global configuration and variables</:subtitle>
+        <:subtitle>Global variables and secrets</:subtitle>
       </.header>
 
       <div class="mt-6 space-y-6">

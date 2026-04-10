@@ -1,0 +1,86 @@
+{
+  "slug": "dependency-auditor",
+  "name": "Dependency Auditor",
+  "description": "Scans dependencies for vulnerabilities, outdated packages, and license issues",
+  "category": "security",
+  "kind": "custom",
+  "tags": [
+    "security",
+    "dependencies",
+    "audit"
+  ],
+  "icon": "hero-shield-check",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Weekly Dependency Audit",
+    "config": {
+      "cron_expression": "0 6 * * 1",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "findings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "package": {
+              "type": "string"
+            },
+            "current_version": {
+              "type": "string"
+            },
+            "issue_type": {
+              "type": "string",
+              "enum": [
+                "outdated",
+                "vulnerable",
+                "deprecated",
+                "license",
+                "unnecessary"
+              ]
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "critical",
+                "warning",
+                "info"
+              ]
+            },
+            "description": {
+              "type": "string"
+            },
+            "recommended_action": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "package",
+            "issue_type",
+            "severity",
+            "description",
+            "recommended_action"
+          ]
+        }
+      },
+      "summary": {
+        "type": "string"
+      },
+      "total_dependencies": {
+        "type": "integer"
+      },
+      "issues_found": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "findings",
+      "summary"
+    ]
+  },
+  "seed_default_workflow": false
+}

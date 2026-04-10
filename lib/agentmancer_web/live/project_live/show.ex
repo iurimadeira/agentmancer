@@ -3,7 +3,7 @@ defmodule AgentmancerWeb.ProjectLive.Show do
 
   alias Agentmancer.Projects
   alias Agentmancer.Projects.Repository
-  alias Agentmancer.Agents
+  alias Agentmancer.Skills
   alias Agentmancer.Workflows
   alias Agentmancer.Vault
   alias Agentmancer.Execution
@@ -18,8 +18,9 @@ defmodule AgentmancerWeb.ProjectLive.Show do
        page_title: project.name,
        project: project,
        repos: Projects.list_repositories(project.id),
-       agents: Agents.list_agent_definitions(project.id),
        workflows: Workflows.list_workflow_definitions(project.id),
+       skill_bindings_count: Workflows.count_skill_bindings(project.id),
+       global_skills_count: length(Skills.list_global_skills()),
        runs: Execution.list_runs(project_id: project.id, limit: 5),
        repo_form: to_form(Projects.change_repository(%Repository{})),
        var_key: "",
@@ -177,8 +178,9 @@ defmodule AgentmancerWeb.ProjectLive.Show do
           live_action={@live_action}
           project={@project}
           repos={@repos}
-          agents={@agents}
           workflows={@workflows}
+          skill_bindings_count={@skill_bindings_count}
+          global_skills_count={@global_skills_count}
           runs={@runs}
           repo_form={@repo_form}
           variables={@variables}
@@ -197,10 +199,10 @@ defmodule AgentmancerWeb.ProjectLive.Show do
     ~H"""
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="stat bg-base-200 rounded-lg">
-        <div class="stat-title">Agents</div>
-        <div class="stat-value text-sm">{length(@agents)}</div>
+        <div class="stat-title">Configured Skills</div>
+        <div class="stat-value text-sm">{@skill_bindings_count}</div>
         <div class="stat-actions">
-          <.link navigate={~p"/projects/#{@project.slug}/agents"} class="btn btn-ghost">
+          <.link navigate={~p"/projects/#{@project.slug}/skills"} class="btn btn-ghost">
             View <.icon name="hero-arrow-right" class="size-3" />
           </.link>
         </div>
@@ -222,6 +224,25 @@ defmodule AgentmancerWeb.ProjectLive.Show do
         <div class="stat-actions">
           <.link navigate={~p"/projects/#{@project.slug}/repos"} class="btn btn-ghost">
             View <.icon name="hero-arrow-right" class="size-3" />
+          </.link>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200 mt-6">
+      <div class="card-body">
+        <h3 class="card-title text-sm">Skills</h3>
+        <p class="text-sm text-base-content/60">
+          {if @repos == [],
+            do: "Global skills are available now. Add a repository to discover local project skills.",
+            else: "Browse global and repository-local skills for this project."}
+        </p>
+        <div class="flex gap-3 mt-3">
+          <.link navigate={~p"/projects/#{@project.slug}/skills"} class="btn btn-primary">
+            <.icon name="hero-sparkles" class="size-4" /> Project Skills
+          </.link>
+          <.link navigate={~p"/skills"} class="btn btn-ghost">
+            <.icon name="hero-book-open" class="size-4" /> Global Skills ({@global_skills_count})
           </.link>
         </div>
       </div>

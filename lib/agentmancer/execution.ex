@@ -22,6 +22,12 @@ defmodule Agentmancer.Execution do
       end
 
     query =
+      case Keyword.get(opts, :workflow_definition_id) do
+        nil -> query
+        id -> where(query, [r], r.workflow_definition_id == ^id)
+      end
+
+    query =
       case Keyword.get(opts, :status) do
         nil -> query
         status -> where(query, [r], r.status == ^status)
@@ -39,18 +45,23 @@ defmodule Agentmancer.Execution do
     Run
     |> Repo.get!(id)
     |> Repo.preload([
-      :project,
-      :workflow_definition,
-      :agent_version,
       :repository,
       :trigger,
-      attempts: :run,
-      agent_definition: :runtime_profile
+      project: :default_runtime_profile,
+      workflow_definition: :runtime_profile,
+      workflow_binding: :repository,
+      attempts: :run
     ])
   end
 
   def create_run(attrs) do
     %Run{} |> Run.changeset(attrs) |> Repo.insert()
+  end
+
+  def update_run_skill_snapshot(%Run{} = run, attrs) do
+    run
+    |> Run.changeset(attrs)
+    |> Repo.update()
   end
 
   def update_run_status(%Run{} = run, status, attrs \\ %{}) do

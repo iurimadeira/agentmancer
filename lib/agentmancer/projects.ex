@@ -2,15 +2,25 @@ defmodule Agentmancer.Projects do
   import Ecto.Query
   alias Agentmancer.Repo
   alias Agentmancer.Projects.{Project, Repository}
+  alias Agentmancer.RuntimeProfiles
 
   # Project CRUD
 
   def list_active_projects do
-    Project |> where([p], is_nil(p.archived_at)) |> order_by(:name) |> Repo.all()
+    Project
+    |> where([p], is_nil(p.archived_at))
+    |> order_by(:name)
+    |> Repo.all()
+    |> Repo.preload(:default_runtime_profile)
   end
 
   def get_project!(id), do: Repo.get!(Project, id)
-  def get_project_by_slug!(slug), do: Repo.get_by!(Project, slug: slug)
+
+  def get_project_by_slug!(slug) do
+    Project
+    |> Repo.get_by!(slug: slug)
+    |> Repo.preload(:default_runtime_profile)
+  end
 
   def create_project(attrs) do
     %Project{}
@@ -32,6 +42,12 @@ defmodule Agentmancer.Projects do
 
   def archive_project(%Project{} = project) do
     project |> Project.changeset(%{archived_at: DateTime.utc_now()}) |> Repo.update()
+  end
+
+  def set_default_runtime_profile(%Project{} = project, runtime_profile_id) do
+    project
+    |> Project.changeset(%{default_runtime_profile_id: runtime_profile_id})
+    |> Repo.update()
   end
 
   def change_project(%Project{} = project, attrs \\ %{}) do
@@ -59,5 +75,9 @@ defmodule Agentmancer.Projects do
 
   def change_repository(%Repository{} = repo, attrs \\ %{}) do
     Repository.changeset(repo, attrs)
+  end
+
+  def default_runtime_profile(%Project{} = project) do
+    RuntimeProfiles.default_runtime_profile(project)
   end
 end

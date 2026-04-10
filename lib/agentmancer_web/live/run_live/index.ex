@@ -89,7 +89,7 @@ defmodule AgentmancerWeb.RunLive.Index do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Runs
-        <:subtitle>All agent execution runs</:subtitle>
+        <:subtitle>All skill execution runs</:subtitle>
       </.header>
 
       <div class="card bg-base-200 mt-6">

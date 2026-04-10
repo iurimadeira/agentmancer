@@ -1,0 +1,94 @@
+{
+  "slug": "sentry-auto-fixer",
+  "name": "Sentry Auto-Fixer",
+  "description": "Monitors Sentry for unresolved errors, investigates root causes, and opens fix PRs",
+  "category": "code_quality",
+  "kind": "custom",
+  "tags": [
+    "sentry",
+    "errors",
+    "automation"
+  ],
+  "icon": "hero-bug-ant",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Sentry Error Sweep",
+    "config": {
+      "cron_expression": "0 */6 * * *",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": [
+      "issues_reviewed",
+      "issues_fixed",
+      "issues_skipped",
+      "summary"
+    ],
+    "properties": {
+      "issues_reviewed": {
+        "type": "integer"
+      },
+      "issues_fixed": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "sentry_issue_id",
+            "error_title",
+            "root_cause",
+            "pr_url"
+          ],
+          "properties": {
+            "sentry_issue_id": {
+              "type": "string"
+            },
+            "error_title": {
+              "type": "string"
+            },
+            "root_cause": {
+              "type": "string"
+            },
+            "pr_url": {
+              "type": "string"
+            },
+            "files_changed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "issues_skipped": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "sentry_issue_id",
+            "error_title",
+            "reason"
+          ],
+          "properties": {
+            "sentry_issue_id": {
+              "type": "string"
+            },
+            "error_title": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "summary": {
+        "type": "string"
+      }
+    }
+  },
+  "seed_default_workflow": false
+}

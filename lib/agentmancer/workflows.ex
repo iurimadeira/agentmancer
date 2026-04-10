@@ -17,18 +17,23 @@ defmodule Agentmancer.Workflows do
     |> where([w], w.project_id == ^project_id and is_nil(w.archived_at))
     |> order_by(:name)
     |> Repo.all()
+    |> Repo.preload(:runtime_profile)
   end
 
   def get_workflow_definition!(id), do: Repo.get!(WorkflowDefinition, id)
 
-  def get_workflow_definition_by_slug!(slug), do: Repo.get_by!(WorkflowDefinition, slug: slug)
+  def get_workflow_definition_by_slug!(project_id, slug) do
+    WorkflowDefinition
+    |> Repo.get_by!(project_id: project_id, slug: slug)
+    |> Repo.preload(:runtime_profile)
+  end
 
   def list_workflow_bindings(workflow_definition_id) do
     WorkflowBinding
     |> where([b], b.workflow_definition_id == ^workflow_definition_id)
     |> order_by(:position)
     |> Repo.all()
-    |> Repo.preload([:agent_definition, :repository])
+    |> Repo.preload(:repository)
   end
 
   def create_workflow_definition(attrs) do
@@ -53,8 +58,24 @@ defmodule Agentmancer.Workflows do
     binding |> WorkflowBinding.changeset(attrs) |> Repo.update()
   end
 
+  def change_workflow_binding(%WorkflowBinding{} = binding, attrs \\ %{}) do
+    WorkflowBinding.changeset(binding, attrs)
+  end
+
   def delete_workflow_binding(%WorkflowBinding{} = binding) do
     Repo.delete(binding)
+  end
+
+  def first_workflow_binding(workflow_definition_id) do
+    workflow_definition_id
+    |> list_workflow_bindings()
+    |> List.first()
+  end
+
+  def count_skill_bindings(project_id) do
+    WorkflowBinding
+    |> where([b], b.project_id == ^project_id and b.enabled == true)
+    |> Repo.aggregate(:count)
   end
 
   # Triggers

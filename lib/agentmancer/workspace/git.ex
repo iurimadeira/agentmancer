@@ -83,4 +83,35 @@ defmodule Agentmancer.Workspace.Git do
         {:error, {:ls_remote_failed, code, output}}
     end
   end
+
+  @spec list_files(String.t(), String.t(), String.t()) :: {:ok, [String.t()]} | {:error, term()}
+  def list_files(mirror_path, ref, path_prefix) do
+    case System.cmd("git", ["ls-tree", "-r", "--name-only", ref, "--", path_prefix],
+           cd: mirror_path,
+           stderr_to_stdout: true
+         ) do
+      {output, 0} ->
+        files =
+          output
+          |> String.split("\n", trim: true)
+          |> Enum.reject(&(&1 == ""))
+
+        {:ok, files}
+
+      {output, code} ->
+        {:error, {:ls_tree_failed, code, output}}
+    end
+  end
+
+  @spec read_file(String.t(), String.t(), String.t()) :: {:ok, String.t()} | {:error, term()}
+  def read_file(mirror_path, ref, path) do
+    case System.cmd("git", ["show", "#{ref}:#{path}"],
+           cd: mirror_path,
+           stderr_to_stdout: true
+         ) do
+      {output, 0} -> {:ok, output}
+      {_output, 128} -> {:error, :not_found}
+      {output, code} -> {:error, {:git_show_failed, code, output}}
+    end
+  end
 end

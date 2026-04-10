@@ -1,0 +1,87 @@
+{
+  "slug": "onboarding-guide",
+  "name": "Onboarding Guide",
+  "description": "Creates onboarding documentation for new contributors",
+  "category": "documentation",
+  "kind": "custom",
+  "tags": [
+    "onboarding",
+    "documentation",
+    "contributor"
+  ],
+  "icon": "hero-academic-cap",
+  "author": "Agentmancer",
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "project_name": {
+        "type": "string"
+      },
+      "sections": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "command",
+                  "description"
+                ]
+              }
+            }
+          },
+          "required": [
+            "title",
+            "content"
+          ]
+        }
+      },
+      "key_files": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "purpose": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "purpose"
+          ]
+        }
+      },
+      "gotchas": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "project_name",
+      "sections"
+    ]
+  },
+  "seed_default_workflow": false
+}

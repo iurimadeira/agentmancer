@@ -8,8 +8,7 @@ defmodule Agentmancer.Workspace do
           repo_id: String.t(),
           clone_url: String.t(),
           ref: String.t(),
-          head_sha: String.t() | nil,
-          materialization: Materializer.config()
+          head_sha: String.t() | nil
         }
 
   @type workspace_context :: %{
@@ -25,8 +24,7 @@ defmodule Agentmancer.Workspace do
     worktree_path = Paths.worktree_path(spec.run_id)
 
     with :ok <- Git.ensure_mirror(spec.repo_id, spec.clone_url),
-         {:ok, _} <- Git.create_worktree(mirror_path, spec.run_id, spec.ref),
-         :ok <- Materializer.materialize(worktree_path, spec.materialization) do
+         {:ok, _} <- Git.create_worktree(mirror_path, spec.run_id, spec.ref) do
       {:ok,
        %{
          worktree_path: worktree_path,
@@ -40,6 +38,11 @@ defmodule Agentmancer.Workspace do
         cleanup(spec.run_id, worktree_path)
         err
     end
+  end
+
+  @spec materialize(String.t(), Materializer.config()) :: :ok | {:error, term()}
+  def materialize(worktree_path, config) do
+    Materializer.materialize(worktree_path, config)
   end
 
   @spec cleanup(String.t(), String.t()) :: :ok

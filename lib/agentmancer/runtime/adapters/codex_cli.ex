@@ -14,7 +14,7 @@ defmodule Agentmancer.Runtime.Adapters.CodexCLI do
   @impl true
   def prepare_run(ctx) do
     args =
-      ["exec", ctx.prompt, "--json", "--full-auto", "--ephemeral"] ++
+      ["exec", build_prompt(ctx), "--json", "--full-auto", "--ephemeral"] ++
         model_args(ctx.model) ++
         ctx.extra_args
 
@@ -76,6 +76,21 @@ defmodule Agentmancer.Runtime.Adapters.CodexCLI do
 
   @impl true
   def cancel_signal, do: :sigterm
+
+  defp build_prompt(%{system_prompt: prompt, prompt: task})
+       when is_binary(prompt) and prompt != "" do
+    """
+    Skill instructions:
+
+    #{prompt}
+
+    Task:
+
+    #{task}
+    """
+  end
+
+  defp build_prompt(%{prompt: prompt}), do: prompt
 
   defp model_args(nil), do: []
   defp model_args(model), do: ["--model", model]

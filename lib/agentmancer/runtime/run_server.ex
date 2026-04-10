@@ -5,7 +5,11 @@ defmodule Agentmancer.Runtime.RunServer do
 
   alias Agentmancer.Execution
   alias Agentmancer.Runtime.LogBuffer
+  alias Agentmancer.RuntimeProfiles
+  alias Agentmancer.Skills
   alias Agentmancer.Workspace
+
+  @default_prompt "Execute the selected skill using the current repository context."
 
   defstruct [
     :run_id,
@@ -59,50 +63,73 @@ defmodule Agentmancer.Runtime.RunServer do
   def handle_continue(:setup, state) do
     run = Execution.get_run_with_associations!(state.run_id)
 
-    adapter = resolve_adapter(run)
-    timeout_ms = resolve_timeout(run)
-
     workspace_spec = build_workspace_spec(run)
 
     case Workspace.setup(workspace_spec) do
       {:ok, workspace_ctx} ->
-        {:ok, attempt} =
-          Execution.create_attempt(run, %{
-            status: :running,
-            engine: to_string(adapter.capabilities().engine),
-            engine_version: adapter.capabilities().version,
-            worktree_path: workspace_ctx.worktree_path,
-            started_at: DateTime.utc_now()
-          })
+        with {:ok, skill} <- resolve_skill(run, workspace_ctx.worktree_path),
+             :ok <-
+               Workspace.materialize(workspace_ctx.worktree_path, %{
+                 output_schema: skill.output_schema
+               }),
+             {:ok, run} <- maybe_snapshot_skill(run, skill) do
+          adapter = resolve_adapter(run)
+          timeout_ms = resolve_timeout(run)
 
-        run_ctx = build_run_context(run, attempt, workspace_ctx)
+          {:ok, attempt} =
+            Execution.create_attempt(run, %{
+              status: :running,
+              engine: to_string(adapter.capabilities().engine),
+              engine_version: adapter.capabilities().version,
+              worktree_path: workspace_ctx.worktree_path,
+              started_at: DateTime.utc_now()
+            })
 
-        case adapter.prepare_run(run_ctx) do
-          {:ok, {executable, args, _adapter_opts}} ->
-            {:ok, _run} =
-              Execution.update_run_status(run, :running, %{started_at: DateTime.utc_now()})
+          run_ctx = build_run_context(run, skill, attempt, workspace_ctx)
 
-            port = open_port(executable, args, workspace_ctx)
-            os_pid = Port.info(port)[:os_pid]
-            log_buffer = LogBuffer.new(attempt.id, run.project_id)
-            Process.send_after(self(), :timeout, timeout_ms)
+          case adapter.prepare_run(run_ctx) do
+            {:ok, {executable, args, _adapter_opts}} ->
+              {:ok, _run} =
+                Execution.update_run_status(run, :running, %{started_at: DateTime.utc_now()})
 
-            {:noreply,
-             %{
-               state
-               | run: run,
-                 attempt: attempt,
-                 adapter: adapter,
-                 port: port,
-                 os_pid: os_pid,
-                 worktree_path: workspace_ctx.worktree_path,
-                 log_buffer: log_buffer
-             }}
+              port = open_port(executable, args, workspace_ctx)
+              os_pid = Port.info(port)[:os_pid]
+              log_buffer = LogBuffer.new(attempt.id, run.project_id)
+              Process.send_after(self(), :timeout, timeout_ms)
 
+              {:noreply,
+               %{
+                 state
+                 | run: run,
+                   attempt: attempt,
+                   adapter: adapter,
+                   port: port,
+                   os_pid: os_pid,
+                   worktree_path: workspace_ctx.worktree_path,
+                   log_buffer: log_buffer
+               }}
+
+            {:error, reason} ->
+              Logger.error("Run #{state.run_id}: adapter prepare failed: #{inspect(reason)}")
+
+              Execution.fail_run(run, %{
+                error_message: "Adapter prepare failed: #{inspect(reason)}"
+              })
+
+              notify_caller(state.caller, state.run_id, {:error, reason})
+              {:stop, :normal, state}
+          end
+        else
           {:error, reason} ->
-            Logger.error("Run #{state.run_id}: adapter prepare failed: #{inspect(reason)}")
+            Logger.error("Run #{state.run_id}: skill resolution failed: #{inspect(reason)}")
 
-            Execution.fail_run(run, %{error_message: "Adapter prepare failed: #{inspect(reason)}"})
+            Execution.fail_run(run, %{
+              error_message: "Skill resolution failed: #{inspect(reason)}"
+            })
+
+            if workspace_ctx.worktree_path do
+              Workspace.cleanup(state.run_id, workspace_ctx.worktree_path)
+            end
 
             notify_caller(state.caller, state.run_id, {:error, reason})
             {:stop, :normal, state}
@@ -246,44 +273,56 @@ defmodule Agentmancer.Runtime.RunServer do
   end
 
   defp resolve_runtime_profile(%{
-         agent_definition: %{runtime_profile: %Ecto.Association.NotLoaded{}}
+         workflow_definition: %{runtime_profile: %Ecto.Association.NotLoaded{}},
+         project: project
        }),
-       do: nil
+       do: resolve_project_runtime_profile(project)
 
-  defp resolve_runtime_profile(%{agent_definition: %{runtime_profile: runtime_profile}})
+  defp resolve_runtime_profile(%{workflow_definition: %{runtime_profile: runtime_profile}})
        when not is_nil(runtime_profile),
        do: runtime_profile
 
+  defp resolve_runtime_profile(%{project: project}), do: resolve_project_runtime_profile(project)
+
   defp resolve_runtime_profile(_), do: nil
+
+  defp resolve_project_runtime_profile(%{
+         default_runtime_profile: %Ecto.Association.NotLoaded{},
+         id: project_id
+       }) do
+    RuntimeProfiles.default_runtime_profile(%Agentmancer.Projects.Project{id: project_id})
+  end
+
+  defp resolve_project_runtime_profile(%{default_runtime_profile: runtime_profile})
+       when not is_nil(runtime_profile),
+       do: runtime_profile
+
+  defp resolve_project_runtime_profile(project) when not is_nil(project) do
+    RuntimeProfiles.default_runtime_profile(project)
+  end
+
+  defp resolve_project_runtime_profile(_), do: nil
 
   defp build_workspace_spec(run) do
     repo = run.repository
-    version = run.agent_version
 
     %{
       run_id: run.id,
       repo_id: repo.id,
       clone_url: repo.clone_url,
       ref: run.branch || repo.default_branch || "main",
-      head_sha: run.pr_head_sha,
-      materialization: %{
-        agents_md: version && version.system_prompt,
-        mcp_config: nil,
-        env_vars: %{},
-        output_schema: version && version.output_schema
-      }
+      head_sha: run.pr_head_sha
     }
   end
 
-  defp build_run_context(run, _attempt, workspace_ctx) do
-    version = run.agent_version
-    prompt = (run.input && run.input["prompt"]) || ""
+  defp build_run_context(run, skill, _attempt, workspace_ctx) do
+    prompt = normalize_prompt(run)
 
     %{
       run_id: run.id,
       prompt: prompt,
-      system_prompt: version && version.system_prompt,
-      output_schema: version && version.output_schema,
+      system_prompt: skill.body,
+      output_schema: skill.output_schema,
       worktree_path: workspace_ctx.worktree_path,
       env_vars: %{},
       timeout_ms: resolve_timeout(run),
@@ -292,6 +331,60 @@ defmodule Agentmancer.Runtime.RunServer do
       sandbox_mode: :workspace_write,
       extra_args: []
     }
+  end
+
+  defp normalize_prompt(%{input: %{"prompt" => prompt}}) when is_binary(prompt) and prompt != "",
+    do: prompt
+
+  defp normalize_prompt(_), do: @default_prompt
+
+  defp resolve_skill(%{skill_body: body} = run, _worktree_path)
+       when is_binary(body) and body != "" do
+    {:ok,
+     %Skills.Skill{
+       source: run.skill_source,
+       slug: run.skill_slug,
+       name: run.skill_name || Skills.titleize_slug(run.skill_slug),
+       body: body,
+       description: get_in(run.skill_metadata || %{}, ["description"]),
+       kind: get_in(run.skill_metadata || %{}, ["kind"]),
+       tags: get_in(run.skill_metadata || %{}, ["tags"]) || [],
+       icon: get_in(run.skill_metadata || %{}, ["icon"]),
+       output_schema: get_in(run.skill_metadata || %{}, ["output_schema"]),
+       suggested_trigger: get_in(run.skill_metadata || %{}, ["suggested_trigger"]) || %{},
+       seed_default_workflow: false,
+       metadata: run.skill_metadata || %{}
+     }}
+  end
+
+  defp resolve_skill(%{skill_source: :global, skill_slug: slug}, _worktree_path) do
+    Skills.fetch_global_skill(slug)
+  end
+
+  defp resolve_skill(
+         %{skill_source: :repository, skill_slug: slug, repository: repo},
+         worktree_path
+       ) do
+    Skills.fetch_repository_skill_from_worktree(worktree_path, slug, repo)
+  end
+
+  defp resolve_skill(_run, _worktree_path), do: {:error, :skill_not_configured}
+
+  defp maybe_snapshot_skill(run, skill) do
+    snapshot_attrs = %{
+      skill_name: skill.name,
+      skill_body: skill.body,
+      skill_metadata:
+        skill.metadata
+        |> Map.put_new("description", skill.description)
+        |> Map.put_new("kind", skill.kind)
+        |> Map.put_new("tags", skill.tags)
+        |> Map.put_new("icon", skill.icon)
+        |> Map.put_new("output_schema", skill.output_schema)
+        |> Map.put_new("suggested_trigger", skill.suggested_trigger)
+    }
+
+    Execution.update_run_skill_snapshot(run, snapshot_attrs)
   end
 
   defp open_port(executable, args, workspace_ctx) do

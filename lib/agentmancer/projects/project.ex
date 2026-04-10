@@ -8,8 +8,9 @@ defmodule Agentmancer.Projects.Project do
     field :settings, :map, default: %{}
     field :archived_at, :utc_datetime_usec
 
+    belongs_to :default_runtime_profile, Agentmancer.RuntimeProfiles.RuntimeProfile
+
     has_many :repositories, Agentmancer.Projects.Repository
-    has_many :agent_definitions, Agentmancer.Agents.AgentDefinition
     has_many :workflow_definitions, Agentmancer.Workflows.WorkflowDefinition
 
     timestamps()
@@ -17,10 +18,18 @@ defmodule Agentmancer.Projects.Project do
 
   def changeset(project, attrs) do
     project
-    |> cast(attrs, [:name, :slug, :description, :settings, :archived_at])
+    |> cast(attrs, [
+      :name,
+      :slug,
+      :description,
+      :settings,
+      :archived_at,
+      :default_runtime_profile_id
+    ])
     |> validate_required([:name, :slug])
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:slug, ~r/^[a-z0-9-]+$/)
     |> unique_constraint(:slug)
+    |> foreign_key_constraint(:default_runtime_profile_id)
   end
 end

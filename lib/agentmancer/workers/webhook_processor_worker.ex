@@ -23,30 +23,31 @@ defmodule Agentmancer.Workers.WebhookProcessorWorker do
   defp enqueue_runs_for_trigger(trigger, event) do
     trigger =
       Repo.preload(trigger,
-        workflow_definition: [workflow_bindings: [:agent_definition]]
+        workflow_definition: [workflow_bindings: [:repository]]
       )
 
     for binding <- trigger.workflow_definition.workflow_bindings,
-        binding.enabled do
-      agent_def = Repo.preload(binding.agent_definition, :active_version)
+        binding.enabled,
+        not is_nil(binding.repository_id),
+        not is_nil(binding.skill_source),
+        not is_nil(binding.skill_slug) do
+      {:ok, run} =
+        Execution.create_run(%{
+          project_id: trigger.project_id,
+          workflow_definition_id: trigger.workflow_definition_id,
+          workflow_binding_id: binding.id,
+          repository_id: binding.repository_id,
+          trigger_id: trigger.id,
+          trigger_event_id: event.id,
+          status: :pending,
+          number: Execution.next_run_number(trigger.project_id),
+          skill_source: binding.skill_source,
+          skill_slug: binding.skill_slug,
+          skill_name:
+            binding.skill_slug |> to_string() |> String.replace("-", " ") |> String.capitalize()
+        })
 
-      if agent_def.active_version_id do
-        {:ok, run} =
-          Execution.create_run(%{
-            project_id: trigger.project_id,
-            workflow_definition_id: trigger.workflow_definition_id,
-            workflow_binding_id: binding.id,
-            agent_definition_id: binding.agent_definition_id,
-            agent_version_id: agent_def.active_version_id,
-            repository_id: binding.repository_id,
-            trigger_id: trigger.id,
-            trigger_event_id: event.id,
-            status: :pending,
-            number: Execution.next_run_number(trigger.project_id)
-          })
-
-        Oban.insert(Agentmancer.Workers.RunExecutionWorker.new(%{run_id: run.id}))
-      end
+      Oban.insert(Agentmancer.Workers.RunExecutionWorker.new(%{run_id: run.id}))
     end
   end
 end

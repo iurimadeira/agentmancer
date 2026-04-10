@@ -24,12 +24,15 @@ defmodule Agentmancer.Execution.Run do
     field :error_message, :string
     field :oban_job_id, :integer
     field :trigger_event_id, :binary_id
+    field :skill_source, Ecto.Enum, values: [:global, :repository]
+    field :skill_slug, :string
+    field :skill_name, :string
+    field :skill_body, :string
+    field :skill_metadata, :map, default: %{}
 
     belongs_to :project, Agentmancer.Projects.Project
     belongs_to :workflow_definition, Agentmancer.Workflows.WorkflowDefinition
     belongs_to :workflow_binding, Agentmancer.Workflows.WorkflowBinding
-    belongs_to :agent_definition, Agentmancer.Agents.AgentDefinition
-    belongs_to :agent_version, Agentmancer.Agents.AgentVersion
     belongs_to :repository, Agentmancer.Projects.Repository
     belongs_to :trigger, Agentmancer.Workflows.Trigger
     belongs_to :parent_run, Agentmancer.Execution.Run
@@ -62,11 +65,14 @@ defmodule Agentmancer.Execution.Run do
       :error_message,
       :oban_job_id,
       :trigger_event_id,
+      :skill_source,
+      :skill_slug,
+      :skill_name,
+      :skill_body,
+      :skill_metadata,
       :project_id,
       :workflow_definition_id,
       :workflow_binding_id,
-      :agent_definition_id,
-      :agent_version_id,
       :repository_id,
       :trigger_id,
       :parent_run_id,
@@ -77,16 +83,14 @@ defmodule Agentmancer.Execution.Run do
       :number,
       :project_id,
       :workflow_definition_id,
-      :agent_definition_id,
-      :agent_version_id,
+      :skill_source,
+      :skill_slug,
       :repository_id,
       :trigger_id
     ])
     |> foreign_key_constraint(:project_id)
     |> foreign_key_constraint(:workflow_definition_id)
     |> foreign_key_constraint(:workflow_binding_id)
-    |> foreign_key_constraint(:agent_definition_id)
-    |> foreign_key_constraint(:agent_version_id)
     |> foreign_key_constraint(:repository_id)
     |> foreign_key_constraint(:trigger_id)
     |> foreign_key_constraint(:parent_run_id)

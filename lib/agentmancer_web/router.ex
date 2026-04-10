@@ -58,17 +58,9 @@ defmodule AgentmancerWeb.Router do
       live "/projects/new", ProjectLive.Index, :new
       live "/projects/:slug", ProjectLive.Show, :show
       live "/projects/:slug/repos", ProjectLive.Show, :repos
+      live "/projects/:slug/skills", ProjectSkillLive.Index, :index
       live "/projects/:slug/variables", ProjectLive.Show, :variables
-      live "/catalog", CatalogLive.Index, :index
-      live "/catalog/new", CatalogLive.Index, :new
-      live "/catalog/:slug", CatalogLive.Show, :show
-      live "/catalog/:slug/edit", CatalogLive.Show, :edit
-
-      live "/projects/:slug/agents", AgentLive.Index, :index
-      live "/projects/:slug/agents/new", AgentLive.Index, :new
-      live "/projects/:slug/agents/catalog", AgentLive.Index, :catalog
-      live "/projects/:slug/agents/:agent_slug", AgentLive.Show, :show
-      live "/projects/:slug/agents/:agent_slug/edit", AgentLive.Show, :edit
+      live "/skills", SkillLive.Index, :index
       live "/projects/:slug/workflows", WorkflowLive.Index, :index
       live "/projects/:slug/workflows/new", WorkflowLive.Index, :new
       live "/projects/:slug/workflows/:workflow_slug", WorkflowLive.Show, :show

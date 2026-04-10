@@ -64,8 +64,8 @@ defmodule AgentmancerWeb.Layouts do
               </.link>
             </li>
             <li>
-              <.link navigate={~p"/catalog"} class="gap-2">
-                <.icon name="hero-book-open" class="size-4" /> Catalog
+              <.link navigate={~p"/skills"} class="gap-2">
+                <.icon name="hero-sparkles" class="size-4" /> Skills
               </.link>
             </li>
             <li>

@@ -1,0 +1,68 @@
+{
+  "slug": "digest-reporter",
+  "name": "Digest Reporter",
+  "description": "Generates summary digest of recent activity",
+  "category": "reporting",
+  "kind": "digest",
+  "tags": [
+    "digest",
+    "summary",
+    "reporting"
+  ],
+  "icon": "hero-newspaper",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Weekly Digest",
+    "config": {
+      "cron_expression": "0 9 * * 1",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "period": {
+        "type": "string"
+      },
+      "sections": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "title",
+            "items"
+          ]
+        }
+      },
+      "highlights": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "action_items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "period",
+      "sections"
+    ]
+  },
+  "seed_default_workflow": true
+}

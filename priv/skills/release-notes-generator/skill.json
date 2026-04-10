@@ -1,0 +1,79 @@
+{
+  "slug": "release-notes-generator",
+  "name": "Release Notes Generator",
+  "description": "Generates user-facing release notes from recent changes",
+  "category": "reporting",
+  "kind": "custom",
+  "tags": [
+    "release",
+    "changelog",
+    "documentation"
+  ],
+  "icon": "hero-document-text",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Bi-Monthly Release Notes",
+    "config": {
+      "cron_expression": "0 10 1,15 * *",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "string"
+      },
+      "date": {
+        "type": "string"
+      },
+      "sections": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "reference": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            }
+          },
+          "required": [
+            "title",
+            "items"
+          ]
+        }
+      },
+      "breaking_changes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "summary": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "sections",
+      "summary"
+    ]
+  },
+  "seed_default_workflow": false
+}

@@ -1,0 +1,160 @@
+{
+  "slug": "google-ads-digest",
+  "name": "Google Ads Digest",
+  "description": "Generates Google Ads performance overview with insights and progressive analysis",
+  "category": "reporting",
+  "kind": "digest",
+  "tags": [
+    "google-ads",
+    "reporting",
+    "insights"
+  ],
+  "icon": "hero-chart-bar",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Weekly Ads Digest",
+    "config": {
+      "cron_expression": "0 8 * * 1",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": [
+      "reporting_period",
+      "account_summary",
+      "campaigns",
+      "summary"
+    ],
+    "properties": {
+      "reporting_period": {
+        "type": "object",
+        "properties": {
+          "start_date": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          }
+        }
+      },
+      "account_summary": {
+        "type": "object",
+        "properties": {
+          "total_spend": {
+            "type": "number"
+          },
+          "total_conversions": {
+            "type": "number"
+          },
+          "total_impressions": {
+            "type": "number"
+          },
+          "overall_roas": {
+            "type": "number"
+          }
+        }
+      },
+      "campaigns": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "campaign_name",
+            "spend",
+            "impressions",
+            "clicks",
+            "conversions"
+          ],
+          "properties": {
+            "campaign_name": {
+              "type": "string"
+            },
+            "campaign_id": {
+              "type": "string"
+            },
+            "spend": {
+              "type": "number"
+            },
+            "impressions": {
+              "type": "integer"
+            },
+            "clicks": {
+              "type": "integer"
+            },
+            "ctr": {
+              "type": "number"
+            },
+            "conversions": {
+              "type": "number"
+            },
+            "cpa": {
+              "type": "number"
+            },
+            "roas": {
+              "type": "number"
+            },
+            "trend": {
+              "type": "string",
+              "enum": [
+                "improving",
+                "stable",
+                "declining",
+                "new"
+              ]
+            }
+          }
+        }
+      },
+      "insights": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "recommendations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "campaign",
+            "action"
+          ],
+          "properties": {
+            "campaign": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "expected_impact": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "previous_run_comparison": {
+        "type": "object",
+        "properties": {
+          "spend_change_pct": {
+            "type": "number"
+          },
+          "conversion_change_pct": {
+            "type": "number"
+          },
+          "recommendations_followed": {
+            "type": "integer"
+          },
+          "recommendations_total": {
+            "type": "integer"
+          }
+        }
+      },
+      "summary": {
+        "type": "string"
+      }
+    }
+  },
+  "seed_default_workflow": false
+}

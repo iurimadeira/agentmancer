@@ -1,0 +1,100 @@
+{
+  "slug": "freshdesk-auto-fixer",
+  "name": "Freshdesk Auto-Fixer",
+  "description": "Reads Freshdesk tickets, identifies bugs, investigates root causes, and opens fix PRs",
+  "category": "code_quality",
+  "kind": "custom",
+  "tags": [
+    "freshdesk",
+    "bugs",
+    "automation"
+  ],
+  "icon": "hero-ticket",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "schedule",
+    "name": "Freshdesk Bug Sweep",
+    "config": {
+      "cron_expression": "0 */8 * * *",
+      "timezone": "UTC"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": [
+      "tickets_reviewed",
+      "bugs_fixed",
+      "tickets_skipped",
+      "summary"
+    ],
+    "properties": {
+      "tickets_reviewed": {
+        "type": "integer"
+      },
+      "bugs_fixed": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "ticket_id",
+            "ticket_subject",
+            "root_cause",
+            "pr_url"
+          ],
+          "properties": {
+            "ticket_id": {
+              "type": "string"
+            },
+            "ticket_subject": {
+              "type": "string"
+            },
+            "classification": {
+              "type": "string"
+            },
+            "root_cause": {
+              "type": "string"
+            },
+            "pr_url": {
+              "type": "string"
+            },
+            "files_changed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "tickets_skipped": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "ticket_id",
+            "ticket_subject",
+            "reason"
+          ],
+          "properties": {
+            "ticket_id": {
+              "type": "string"
+            },
+            "ticket_subject": {
+              "type": "string"
+            },
+            "classification": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "summary": {
+        "type": "string"
+      }
+    }
+  },
+  "seed_default_workflow": false
+}

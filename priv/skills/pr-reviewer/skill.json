@@ -1,0 +1,82 @@
+{
+  "slug": "pr-reviewer",
+  "name": "PR Reviewer",
+  "description": "Reviews PRs with specialist sub-agents for language, design, security, and testing",
+  "category": "code_quality",
+  "kind": "pr_review",
+  "tags": [
+    "review",
+    "security",
+    "quality"
+  ],
+  "icon": "hero-magnifying-glass",
+  "author": "Agentmancer",
+  "suggested_trigger": {
+    "type": "webhook",
+    "name": "PR Events",
+    "config": {
+      "event_filter": [
+        "pull_request.opened",
+        "pull_request.synchronize"
+      ]
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "findings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string"
+            },
+            "line_start": {
+              "type": "integer"
+            },
+            "line_end": {
+              "type": "integer"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "critical",
+                "warning",
+                "suggestion",
+                "praise"
+              ]
+            },
+            "category": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "suggested_fix": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "file_path",
+            "severity",
+            "category",
+            "title",
+            "body"
+          ]
+        }
+      },
+      "summary": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "findings",
+      "summary"
+    ]
+  },
+  "seed_default_workflow": true
+}

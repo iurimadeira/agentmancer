@@ -1,0 +1,9 @@
+[project]
+name = "agentmancer"
+
+[ports]
+PORT = {}
+
+[env]
+DB_NAME = { template = "{project}_dev_{worktree}" }
+TEST_DB_NAME = { template = "{project}_test_{worktree}" }
